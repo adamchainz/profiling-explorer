@@ -1,7 +1,5 @@
 ci:
   autoupdate_schedule: monthly
-  skip:
-  - clang-format
 
 default_language_version:
   python: python3.13
@@ -54,4 +52,5 @@ repos:
   hooks:
   - id: mypy
     additional_dependencies:
+    - django-stubs==6.0.1
     - pytest==7.1.2

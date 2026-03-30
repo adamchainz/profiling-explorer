@@ -6,7 +6,7 @@ import re
 from dataclasses import dataclass
 from importlib.resources import open_binary
 
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
@@ -51,9 +51,9 @@ def _shorten_filename(filename: str) -> str:
 
 def _build_rows(s: pstats.Stats) -> list[Row]:
     rows = []
-    for key in s.fcn_list:
+    for key in s.fcn_list:  # type: ignore[attr-defined]
         filename, lineno, funcname = key
-        _, total_calls, tottime, cumtime, _ = s.stats[key]
+        _, total_calls, tottime, cumtime, _ = s.stats[key]  # type: ignore[attr-defined]
         if filename == "~":
             # Built-in / C-level function: pstats uses "~" as a fake path.
             # Mirror pstats' func_std_string: strip <…> angle brackets and
@@ -79,7 +79,7 @@ def _build_rows(s: pstats.Stats) -> list[Row]:
     return rows
 
 
-def index(request):
+def index(request: HttpRequest) -> HttpResponse:
     return render(
         request,
         "index.html",
@@ -91,12 +91,12 @@ def index(request):
 
 
 @require_GET
-def file(request, *, filename):
+def file(request: HttpRequest, *, filename: str) -> FileResponse:
     return FileResponse(open_binary("profiling_explorer", f"static/{filename}"))
 
 
 @require_GET
-def favicon(request):
+def favicon(request: HttpRequest) -> HttpResponse:
     return HttpResponse(
         (
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'

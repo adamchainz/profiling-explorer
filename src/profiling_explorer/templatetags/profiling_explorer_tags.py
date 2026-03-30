@@ -6,5 +6,5 @@ register = Library()
 
 
 @register.filter
-def sub(value, arg):
+def sub(value: int, arg: int) -> int:
     return value - arg
