@@ -1,0 +1,8 @@
+=========
+Changelog
+=========
+
+Pending
+-------
+
+* Initial release.
