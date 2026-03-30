@@ -101,8 +101,8 @@ run.branch = true
 run.data_file = ".coverage/cov"
 run.parallel = true
 run.source = [
-  "tests",
   "profiling_explorer",
+  "tests",
 ]
 paths.source = [
   "src",
