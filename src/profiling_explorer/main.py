@@ -1,8 +1,16 @@
 from __future__ import annotations
 
 import argparse
+import os
+import pstats
 import sys
 from collections.abc import Sequence
+
+import django
+from django.conf import settings
+from django.core.management import call_command
+
+from profiling_explorer import views
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -11,7 +19,66 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(prog="profiling-explorer", allow_abbrev=False)
     parser.suggest_on_error = True  # type: ignore[attr-defined]
-    parser.add_argument("filename", help="The pstats data file to explore.")
+    parser.add_argument(
+        "filename",
+        nargs="+",
+        metavar="FILE",
+        help="The pstats data file(s) to explore.",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8099,
+        metavar="PORT",
+        help="Port for the local web server (default: 8099).",
+    )
+    parser.add_argument(
+        "--dev",
+        action="store_true",
+        default=False,
+        help="Run in development mode (enables server reload and debug mode).",
+    )
     args = parser.parse_args(argv)
+
+    views.filenames = args.filename
+    views.stats = pstats.Stats(*args.filename)
+    views.stats.sort_stats("cumulative")
+
+    settings.configure(
+        DEBUG=args.dev,
+        ALLOWED_HOSTS=["*"],  # Disable host header validation
+        ROOT_URLCONF="profiling_explorer.urls",
+        SECRET_KEY="we-dont-use-any-secret-features-so-whatever",
+        INSTALLED_APPS=[
+            "profiling_explorer",
+        ],
+        MIDDLEWARE=[
+            "django.middleware.common.CommonMiddleware",
+        ],
+        TEMPLATES=[
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "DIRS": [],
+                "APP_DIRS": True,
+                "OPTIONS": {
+                    "builtins": [
+                        "profiling_explorer.templatetags.profiling_explorer_tags",
+                    ],
+                },
+            }
+        ],
+    )
+    # Hide development server warning
+    # https://docs.djangoproject.com/en/stable/ref/django-admin/#envvar-DJANGO_RUNSERVER_HIDE_WARNING
+    os.environ["DJANGO_RUNSERVER_HIDE_WARNING"] = "true"
+
+    django.setup()
+
+    call_command(
+        "runserver",
+        f"127.0.0.1:{args.port}",
+        *("--noreload" if not args.dev else ()),
+        "--nothreading",
+    )
 
     return 0

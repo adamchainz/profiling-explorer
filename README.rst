@@ -95,12 +95,14 @@ Full help:
 
 .. code-block:: console
 
-   usage: profiling-explorer [-h] filename
+   usage: profiling-explorer [-h] [--port PORT] [--dev] FILE [FILE ...]
 
    positional arguments:
-     filename    The pstats data file to explore.
+     FILE         The pstats data file(s) to explore.
 
    options:
-     -h, --help  show this help message and exit
+     -h, --help   show this help message and exit
+     --port PORT  Port for the local web server (default: 8099).
+     --dev        Run in development mode (enables server reload and debug mode).
 
 .. [[[end]]]
