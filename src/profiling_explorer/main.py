@@ -51,6 +51,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         SECRET_KEY="we-dont-use-any-secret-features-so-whatever",
         INSTALLED_APPS=[
             "profiling_explorer",
+            "django.contrib.humanize",
         ],
         MIDDLEWARE=[
             "django.middleware.common.CommonMiddleware",
@@ -63,6 +64,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "OPTIONS": {
                     "builtins": [
                         "profiling_explorer.templatetags.profiling_explorer_tags",
+                        "django.contrib.humanize.templatetags.humanize",
                     ],
                 },
             }
@@ -77,7 +79,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     call_command(
         "runserver",
         f"127.0.0.1:{args.port}",
-        *("--noreload" if not args.dev else ()),
+        *(("--noreload",) if not args.dev else ()),
         "--nothreading",
     )
 

@@ -1,13 +1,40 @@
 <!DOCTYPE html>
 <html lang=en>
-<head>
-  <title>profiling-explorer</title>
-  <link rel="stylesheet" href=styles.css>
-</head>
-<body>
-  <nav>
-    <h1>🔍 profiling-explorer</h1>
-    <h2>{{ filenames.0 }}{% if filenames|length > 1 %} and {{ filenames|length|sub:1 }} more{% endif %}</h2>
-  </nav>
-</body>
+  <head>
+    <title>profiling-explorer</title>
+    <link rel=stylesheet href=styles.css>
+  </head>
+  <body>
+    <svg hidden width=0 height=0>
+      <symbol id="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        <rect width="13" height="13" x="9" y="9" rx="2"></rect>
+      </symbol>
+    </svg>
+    <nav>
+      <h1>🗺️ profiling-explorer</h1>
+      <h2>{{ filenames.0 }}{% if filenames|length > 1 %} +{{ filenames|length|sub:1 }} more{% endif %}</h2>
+    </nav>
+    <main>
+      <table>
+        <thead>
+          <tr>
+            <th>calls
+            <th>internal ms
+            <th>cumulative ms
+            <th>filename:lineno function
+        </thead>
+        <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.total_calls|intcomma }}
+            <td>{{ row.tottime_ms|intcomma }}
+            <td>{{ row.cumtime_ms|intcomma }}
+            <td title="{{ row.full_filename }}"><button {% if not row.full_filename %}disabled{% endif %} class=copy-btn data-copy="{{ row.full_filename }}:{{ row.lineno }}" aria-label="Copy"><svg aria-hidden="true" width="18" height="18"><use href="#icon-copy"></use></svg></button>{% if row.filename %}{{ row.filename }}:{{ row.lineno }} {% endif %}<pe-funcname>{{ row.funcname }}</pe-funcname>
+        {% endfor %}
+        </tbody>
+      </table>
+    </main>
+  <script src=script.js type=module></script>
+  </body>
 </html>
