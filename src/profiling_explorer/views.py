@@ -79,13 +79,48 @@ def _build_rows(s: pstats.Stats) -> list[Row]:
     return rows
 
 
+_SORT_FIELDS = {
+    "calls": "total_calls",
+    "tottime": "tottime_ms",
+    "cumtime": "cumtime_ms",
+}
+
+
 def index(request: HttpRequest) -> HttpResponse:
+    sort_param = request.GET.get("sort", "-cumtime")
+    sort_desc = not sort_param.startswith("+")
+    sort_col = sort_param.lstrip("+-")
+    if sort_col not in _SORT_FIELDS:
+        sort_col = "cumtime"
+        sort_desc = True
+
+    rows = _build_rows(stats)
+    rows.sort(key=lambda r: getattr(r, _SORT_FIELDS[sort_col]), reverse=sort_desc)
+
+    def col_config(key: str, label: str) -> dict[str, str]:
+        config = {
+            "key": key,
+            "label": label,
+        }
+        if sort_col == key:
+            config["indicator"] = "↓" if sort_desc else "↑"
+            config["next_sort"] = f"+{key}" if sort_desc else f"-{key}"
+        else:
+            config["indicator"] = ""
+            config["next_sort"] = f"-{key}"
+        return config
+
     return render(
         request,
         "index.html",
         {
             "filenames": filenames,
-            "rows": _build_rows(stats),
+            "rows": rows,
+            "columns": [
+                col_config("calls", "calls"),
+                col_config("tottime", "internal ms"),
+                col_config("cumtime", "cumulative ms"),
+            ],
         },
     )
 

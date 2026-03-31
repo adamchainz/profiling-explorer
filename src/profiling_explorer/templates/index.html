@@ -19,9 +19,9 @@
       <table>
         <thead>
           <tr>
-            <th>calls
-            <th>internal ms
-            <th>cumulative ms
+            {% for col in columns %}
+            <th><a href="{% querystring sort=col.next_sort %}">{{ col.label }} <pe-sort-indicator>{{ col.indicator }}</pe-sort-indicator></a>
+            {% endfor %}
             <th>filename:lineno function
         </thead>
         <tbody>

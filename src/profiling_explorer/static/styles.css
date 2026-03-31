@@ -100,10 +100,25 @@ th {
   letter-spacing: .05em;
   color: var(--text-dim);
   border-bottom: 2px solid var(--border);
+
+  &:last-child {
+    text-align: left;
+  }
+
+  & a {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      color: var(--text);
+    }
+  }
 }
 
-th:last-child {
-  text-align: left;
+pe-sort-indicator {
+  margin-left: 0.3em;
 }
 
 td {
