@@ -13,7 +13,8 @@
     </svg>
     <nav>
       <h1>🗺️ profiling-explorer</h1>
-      <h2>{{ filenames.0 }}{% if filenames|length > 1 %} +{{ filenames|length|sub:1 }} more{% endif %}</h2>
+      <h2>{{ profile.filename }}</h2>
+      <p>{{ profile.total_calls|intcomma }} calls &middot; {{ profile.total_time_ms|intcomma }} ms</p>
     </nav>
     <main>
       <table>

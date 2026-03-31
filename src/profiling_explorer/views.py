@@ -5,14 +5,11 @@ import pstats
 import re
 from dataclasses import dataclass
 from importlib.resources import open_binary
+from operator import attrgetter
 
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
-
-# Values set by main.py
-filenames: list[str] = []
-stats = pstats.Stats()
 
 
 @dataclass
@@ -24,6 +21,20 @@ class Row:
     full_filename: str
     lineno: int
     funcname: str
+
+
+@dataclass
+class Profile:
+    filename: str
+    total_calls: int
+    total_time_ms: int
+    rows: list[Row]
+    sort_col: str
+    sort_desc: bool
+
+
+# Populated by main()
+profile: Profile = None  # type: ignore[assignment]
 
 
 _STRIP_PREFIX_RE = re.compile(
@@ -49,7 +60,8 @@ def _shorten_filename(filename: str) -> str:
     return os.path.relpath(filename)
 
 
-def _build_rows(s: pstats.Stats) -> list[Row]:
+def build_profile(s: pstats.Stats, path: str) -> Profile:
+    s.sort_stats("cumulative")
     rows = []
     for key in s.fcn_list:  # type: ignore[attr-defined]
         filename, lineno, funcname = key
@@ -68,15 +80,22 @@ def _build_rows(s: pstats.Stats) -> list[Row]:
         rows.append(
             Row(
                 total_calls=total_calls,
-                tottime_ms=round(tottime * 1000),
-                cumtime_ms=round(cumtime * 1000),
+                tottime_ms=round(tottime * 1_000),
+                cumtime_ms=round(cumtime * 1_000),
                 filename=short_filename,
                 full_filename=full_filename,
                 lineno=lineno,
                 funcname=funcname,
             )
         )
-    return rows
+    return Profile(
+        filename=path,
+        total_calls=s.total_calls,  # type: ignore[attr-defined]
+        total_time_ms=round(s.total_tt * 1000),  # type: ignore[attr-defined]
+        rows=rows,
+        sort_col="cumtime",
+        sort_desc=True,
+    )
 
 
 _SORT_FIELDS = {
@@ -94,14 +113,14 @@ def index(request: HttpRequest) -> HttpResponse:
         sort_col = "cumtime"
         sort_desc = True
 
-    rows = _build_rows(stats)
-    rows.sort(key=lambda r: getattr(r, _SORT_FIELDS[sort_col]), reverse=sort_desc)
+    if profile.sort_col != sort_col or profile.sort_desc != sort_desc:
+        profile.rows.sort(key=attrgetter(_SORT_FIELDS[sort_col]), reverse=sort_desc)
+
+        profile.sort_col = sort_col
+        profile.sort_desc = sort_desc
 
     def col_config(key: str, label: str) -> dict[str, str]:
-        config = {
-            "key": key,
-            "label": label,
-        }
+        config = {"key": key, "label": label}
         if sort_col == key:
             config["indicator"] = "↓" if sort_desc else "↑"
             config["next_sort"] = f"+{key}" if sort_desc else f"-{key}"
@@ -114,8 +133,8 @@ def index(request: HttpRequest) -> HttpResponse:
         request,
         "index.html",
         {
-            "filenames": filenames,
-            "rows": rows,
+            "profile": profile,
+            "rows": profile.rows,
             "columns": [
                 col_config("calls", "calls"),
                 col_config("tottime", "internal ms"),

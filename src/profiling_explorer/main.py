@@ -21,9 +21,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.suggest_on_error = True  # type: ignore[attr-defined]
     parser.add_argument(
         "filename",
-        nargs="+",
         metavar="FILE",
-        help="The pstats data file(s) to explore.",
+        help="The pstats data file to explore.",
     )
     parser.add_argument(
         "--port",
@@ -40,9 +39,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    views.filenames = args.filename
-    views.stats = pstats.Stats(*args.filename)
-    views.stats.sort_stats("cumulative")
+    views.profile = views.build_profile(pstats.Stats(args.filename), args.filename)
 
     settings.configure(
         DEBUG=args.dev,

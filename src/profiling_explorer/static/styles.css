@@ -50,8 +50,7 @@ body {
 nav {
   background: var(--nav-bg);
   color: var(--nav-text);
-  display: grid;
-  grid-template-columns: max-content 1fr;
+  display: flex;
   align-items: baseline;
   gap: 0 1rem;
   padding: 0.6rem 1.5rem 0 1.5rem;
@@ -62,15 +61,22 @@ nav {
     font-size: 1.1rem;
     font-weight: 600;
     letter-spacing: -.01em;
+    white-space: nowrap;
   }
 
   & h2 {
     margin: 0;
     font-size: 1.1rem;
     font-weight: 400;
-    color: var(--nav-dim);
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  & p {
+    margin: 0;
+    font-size: 0.9rem;
     white-space: nowrap;
   }
 }
