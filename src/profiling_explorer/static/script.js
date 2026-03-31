@@ -1,3 +1,9 @@
+async function fetchDoc(url, options) {
+  const response = await fetch(url, options);
+  const html = await response.text();
+  return new DOMParser().parseFromString(html, 'text/html');
+}
+
 // Filter box
 const searchInput = document.getElementById('pe-search');
 let searchTimeout = null;
@@ -18,11 +24,8 @@ searchInput.addEventListener('input', () => {
     searchAbort?.abort();
     searchAbort = new AbortController();
     try {
-      const response = await fetch(url, { signal: searchAbort.signal });
-      const html = await response.text();
-      const tmpl = document.createElement('template');
-      tmpl.innerHTML = html;
-      document.querySelector('main').replaceWith(tmpl.content.querySelector('main'));
+      const doc = await fetchDoc(url, { signal: searchAbort.signal });
+      document.querySelector('main').replaceWith(doc.querySelector('main'));
     } catch (e) {
       if (e.name !== 'AbortError') throw e;
     }
@@ -62,19 +65,16 @@ class PePaginationMarker extends HTMLElement {
   }
 
   async _load() {
-    const response = await fetch(this.dataset.url);
-    const html = await response.text();
-    const tmpl = document.createElement('template');
-    tmpl.innerHTML = html;
+    const doc = await fetchDoc(this.dataset.url);
 
     const tbody = document.querySelector('tbody');
-    for (const row of tmpl.content.querySelectorAll('tr')) {
-      tbody.appendChild(row);
+    for (const row of doc.querySelectorAll('tbody tr')) {
+      tbody.appendChild(document.adoptNode(row));
     }
 
-    const nextMarker = tmpl.content.querySelector('pe-pagination-marker');
+    const nextMarker = doc.querySelector('pe-pagination-marker');
     if (nextMarker) {
-      this.replaceWith(nextMarker);
+      this.replaceWith(document.adoptNode(nextMarker));
     } else {
       this.remove();
     }
