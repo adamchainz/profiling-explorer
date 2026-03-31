@@ -95,10 +95,10 @@ Full help:
 
 .. code-block:: console
 
-   usage: profiling-explorer [-h] [--port PORT] [--dev] FILE [FILE ...]
+   usage: profiling-explorer [-h] [--port PORT] [--dev] FILE
 
    positional arguments:
-     FILE         The pstats data file(s) to explore.
+     FILE         The pstats data file to explore.
 
    options:
      -h, --help   show this help message and exit
