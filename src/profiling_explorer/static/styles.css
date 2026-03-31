@@ -89,6 +89,7 @@ main {
 table {
   border-collapse: collapse;
   white-space: nowrap;
+  width: 100%;
 }
 
 thead tr {
@@ -179,4 +180,8 @@ tbody tr:nth-child(even) {
 
 tbody tr:hover {
   background: var(--row-hover);
+}
+
+pe-pagination-marker {
+  display: block;
 }
