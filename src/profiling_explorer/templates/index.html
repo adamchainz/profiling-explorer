@@ -15,6 +15,7 @@
       <h1>🗺️ profiling-explorer</h1>
       <h2>{{ profile.filename }}</h2>
       <p>{{ profile.total_calls|intcomma }} calls &middot; {{ profile.total_time_ms|intcomma }} ms</p>
+      <input type=search id=pe-search placeholder="Filter by filename or function…" autocomplete=off autofocus value="{{ q }}">
     </nav>
     <main>
       <table>

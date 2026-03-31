@@ -41,8 +41,8 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  display: grid;
-  grid-template-rows: auto 1fr;
+  display: flex;
+  flex-direction: column;
   height: 100dvh;
   overflow: hidden;
 }
@@ -50,6 +50,7 @@ body {
 nav {
   background: var(--nav-bg);
   color: var(--nav-text);
+  flex-shrink: 0;
   display: flex;
   align-items: baseline;
   gap: 0 1rem;
@@ -79,11 +80,34 @@ nav {
     font-size: 0.9rem;
     white-space: nowrap;
   }
+
+  & input[type=search] {
+    margin-left: auto;
+    align-self: center;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.875rem;
+    width: 240px;
+
+    &::placeholder {
+      color: var(--text-dim);
+    }
+
+    &:focus {
+      outline: 2px solid var(--funcname);
+      outline-offset: -1px;
+      border-color: transparent;
+    }
+  }
 }
 
 main {
   padding: 0 1.5rem;
   overflow: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 table {

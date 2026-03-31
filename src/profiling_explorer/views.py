@@ -103,8 +103,7 @@ PAGE_SIZE = 200
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    sort_param = request.GET.get("sort", "-cumtime")
-    sort_col, sort_desc, sort_param = _apply_sort(sort_param)
+    sort_col, sort_desc, sort_param = _apply_sort(request)
 
     def col_config(key: str, label: str) -> dict[str, str]:
         config = {"key": key, "label": label}
@@ -116,17 +115,23 @@ def index(request: HttpRequest) -> HttpResponse:
             config["next_sort"] = f"-{key}"
         return config
 
+    q, filtered_rows = _filter_rows(request)
+
     next_url = None
-    if len(profile.rows) > PAGE_SIZE:
-        next_url = "/rows/?" + urlencode({"sort": sort_param, "offset": PAGE_SIZE})
+    if len(filtered_rows) > PAGE_SIZE:
+        params: dict[str, str | int] = {"sort": sort_param, "offset": PAGE_SIZE}
+        if q:
+            params["q"] = q
+        next_url = "/rows/?" + urlencode(params)
 
     return render(
         request,
         "index.html",
         {
             "profile": profile,
-            "rows": profile.rows[:PAGE_SIZE],
+            "rows": filtered_rows[:PAGE_SIZE],
             "next_url": next_url,
+            "q": q,
             "columns": [
                 col_config("calls", "calls"),
                 col_config("tottime", "internal ms"),
@@ -138,16 +143,20 @@ def index(request: HttpRequest) -> HttpResponse:
 
 @require_GET
 def rows_page(request: HttpRequest) -> HttpResponse:
-    sort_param = request.GET.get("sort", "-cumtime")
-    sort_col, sort_desc, sort_param = _apply_sort(sort_param)
+    sort_col, sort_desc, sort_param = _apply_sort(request)
+
+    q, filtered_rows = _filter_rows(request)
 
     offset = int(request.GET.get("offset", 0))
-    page_rows = profile.rows[offset : offset + PAGE_SIZE]
+    page_rows = filtered_rows[offset : offset + PAGE_SIZE]
 
     next_url = None
     next_offset = offset + PAGE_SIZE
-    if next_offset < len(profile.rows):
-        next_url = "/rows/?" + urlencode({"sort": sort_param, "offset": next_offset})
+    if next_offset < len(filtered_rows):
+        params: dict[str, str | int] = {"sort": sort_param, "offset": next_offset}
+        if q:
+            params["q"] = q
+        next_url = "/rows/?" + urlencode(params)
 
     return render(
         request,
@@ -159,6 +168,14 @@ def rows_page(request: HttpRequest) -> HttpResponse:
     )
 
 
+def _filter_rows(request: HttpRequest) -> tuple[str, list[Row]]:
+    q = request.GET.get("q", "").strip()
+    filtered_rows = profile.rows
+    if q:
+        filtered_rows = [r for r in filtered_rows if q in r.filename or q in r.funcname]
+    return q, filtered_rows
+
+
 _SORT_FIELDS = {
     "calls": "total_calls",
     "tottime": "tottime_ms",
@@ -166,7 +183,8 @@ _SORT_FIELDS = {
 }
 
 
-def _apply_sort(sort_param: str) -> tuple[str, bool, str]:
+def _apply_sort(request: HttpRequest) -> tuple[str, bool, str]:
+    sort_param = request.GET.get("sort", "-cumtime")
     sort_desc = not sort_param.startswith("+")
     sort_col = sort_param.lstrip("+-")
     if sort_col not in _SORT_FIELDS:

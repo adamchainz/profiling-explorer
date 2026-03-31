@@ -1,3 +1,48 @@
+// Filter box
+const searchInput = document.getElementById('pe-search');
+let searchTimeout = null;
+let searchAbort = null;
+
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(async () => {
+    const q = searchInput.value.trim();
+    const url = new URL(window.location.href);
+    if (q) {
+      url.searchParams.set('q', q);
+    } else {
+      url.searchParams.delete('q');
+    }
+    history.replaceState(null, '', url);
+
+    searchAbort?.abort();
+    searchAbort = new AbortController();
+    try {
+      const response = await fetch(url, { signal: searchAbort.signal });
+      const html = await response.text();
+      const tmpl = document.createElement('template');
+      tmpl.innerHTML = html;
+      document.querySelector('main').replaceWith(tmpl.content.querySelector('main'));
+    } catch (e) {
+      if (e.name !== 'AbortError') throw e;
+    }
+  }, 300);
+});
+
+// Copy buttons
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('button.copy-btn');
+  if (!btn) return;
+
+  const text = btn.dataset.copy;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    setTimeout(() => btn.classList.remove('copied'), 1500);
+  });
+});
+
+
+// Pagination
 class PePaginationMarker extends HTMLElement {
   connectedCallback() {
     this._observer = new IntersectionObserver(
@@ -37,14 +82,3 @@ class PePaginationMarker extends HTMLElement {
 }
 
 customElements.define('pe-pagination-marker', PePaginationMarker);
-
-document.addEventListener('click', (e) => {
-  const btn = e.target.closest('button.copy-btn');
-  if (!btn) return;
-
-  const text = btn.dataset.copy;
-  navigator.clipboard.writeText(text).then(() => {
-    btn.classList.add('copied');
-    setTimeout(() => btn.classList.remove('copied'), 1500);
-  });
-});
