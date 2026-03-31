@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass
 from importlib.resources import open_binary
 from operator import attrgetter
+from urllib.parse import urlencode
 
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import render
@@ -98,26 +99,12 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
     )
 
 
-_SORT_FIELDS = {
-    "calls": "total_calls",
-    "tottime": "tottime_ms",
-    "cumtime": "cumtime_ms",
-}
+PAGE_SIZE = 200
 
 
 def index(request: HttpRequest) -> HttpResponse:
     sort_param = request.GET.get("sort", "-cumtime")
-    sort_desc = not sort_param.startswith("+")
-    sort_col = sort_param.lstrip("+-")
-    if sort_col not in _SORT_FIELDS:
-        sort_col = "cumtime"
-        sort_desc = True
-
-    if profile.sort_col != sort_col or profile.sort_desc != sort_desc:
-        profile.rows.sort(key=attrgetter(_SORT_FIELDS[sort_col]), reverse=sort_desc)
-
-        profile.sort_col = sort_col
-        profile.sort_desc = sort_desc
+    sort_col, sort_desc, sort_param = _apply_sort(sort_param)
 
     def col_config(key: str, label: str) -> dict[str, str]:
         config = {"key": key, "label": label}
@@ -129,12 +116,17 @@ def index(request: HttpRequest) -> HttpResponse:
             config["next_sort"] = f"-{key}"
         return config
 
+    next_url = None
+    if len(profile.rows) > PAGE_SIZE:
+        next_url = "/rows/?" + urlencode({"sort": sort_param, "offset": PAGE_SIZE})
+
     return render(
         request,
         "index.html",
         {
             "profile": profile,
-            "rows": profile.rows,
+            "rows": profile.rows[:PAGE_SIZE],
+            "next_url": next_url,
             "columns": [
                 col_config("calls", "calls"),
                 col_config("tottime", "internal ms"),
@@ -142,6 +134,50 @@ def index(request: HttpRequest) -> HttpResponse:
             ],
         },
     )
+
+
+@require_GET
+def rows_page(request: HttpRequest) -> HttpResponse:
+    sort_param = request.GET.get("sort", "-cumtime")
+    sort_col, sort_desc, sort_param = _apply_sort(sort_param)
+
+    offset = int(request.GET.get("offset", 0))
+    page_rows = profile.rows[offset : offset + PAGE_SIZE]
+
+    next_url = None
+    next_offset = offset + PAGE_SIZE
+    if next_offset < len(profile.rows):
+        next_url = "/rows/?" + urlencode({"sort": sort_param, "offset": next_offset})
+
+    return render(
+        request,
+        "rows_page.html",
+        {
+            "rows": page_rows,
+            "next_url": next_url,
+        },
+    )
+
+
+_SORT_FIELDS = {
+    "calls": "total_calls",
+    "tottime": "tottime_ms",
+    "cumtime": "cumtime_ms",
+}
+
+
+def _apply_sort(sort_param: str) -> tuple[str, bool, str]:
+    sort_desc = not sort_param.startswith("+")
+    sort_col = sort_param.lstrip("+-")
+    if sort_col not in _SORT_FIELDS:
+        sort_col = "cumtime"
+        sort_desc = True
+        sort_param = "-cumtime"
+    if profile.sort_col != sort_col or profile.sort_desc != sort_desc:
+        profile.rows.sort(key=attrgetter(_SORT_FIELDS[sort_col]), reverse=sort_desc)
+        profile.sort_col = sort_col
+        profile.sort_desc = sort_desc
+    return sort_col, sort_desc, sort_param
 
 
 @require_GET
