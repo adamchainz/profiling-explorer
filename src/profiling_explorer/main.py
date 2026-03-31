@@ -76,8 +76,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     call_command(
         "runserver",
         f"127.0.0.1:{args.port}",
-        *(("--noreload",) if not args.dev else ()),
         "--nothreading",
+        *(() if args.dev else ("--noreload",)),
     )
 
     return 0
