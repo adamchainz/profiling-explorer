@@ -46,6 +46,7 @@ test = [
   "cogapp>=3.6",
   "coverage[toml]",
   "pytest",
+  "pytest-django",
   "pytest-randomly",
 ]
 
@@ -93,7 +94,9 @@ max_supported_python = "3.14"
 ini_options.addopts = """\
     --strict-config
     --strict-markers
+    --ds=profiling_explorer.settings
     """
+ini_options.django_find_project = false
 ini_options.xfail_strict = true
 
 [tool.coverage]

@@ -4,7 +4,7 @@ import os
 import pstats
 import re
 from dataclasses import dataclass
-from importlib.resources import open_binary
+from importlib.resources import files as resource_files
 from operator import attrgetter
 from urllib.parse import urlencode
 
@@ -178,7 +178,12 @@ def _apply_sort(request: HttpRequest) -> tuple[str, bool, str]:
 
 @require_GET
 def file(request: HttpRequest, *, filename: str) -> FileResponse:
-    return FileResponse(open_binary("profiling_explorer", f"static/{filename}"))
+    return FileResponse(
+        resource_files("profiling_explorer")
+        .joinpath("static")
+        .joinpath(filename)
+        .open("rb"),
+    )
 
 
 @require_GET
