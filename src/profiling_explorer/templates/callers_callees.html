@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load humanize profiling_explorer_tags %}
+{% block main %}
+<main>
+  <nav class=secondary>
+    <a href=/ class=back-link>← back</a>
+    <h3>{% if heading == "Callers" %}<svg aria-hidden="true" width="18" height="18"><use href="#icon-tree" transform="rotate(180 9 9)"></use></svg>{% else %}<svg aria-hidden="true" width="18" height="18"><use href="#icon-tree"></use></svg>{% endif %}
+      {{ heading }} of {{ focal_row.filename }}:{{ focal_row.lineno }} <pe-funcname>{{ focal_row.funcname }}</pe-funcname></h3>
+  </nav>
+  <table>
+    <thead>
+      <tr>
+        <th>calls
+        <th>%
+        <th>internal ms
+        <th>cumulative ms <pe-sort-indicator>↓</pe-sort-indicator>
+        <th>%
+        <th class=filename>filename:lineno function
+        <th>
+    </thead>
+    <tbody>
+      {% include "_row.html" with row=focal_row stats=focal_row focal=True only %}
+      {% for row, edge in rows_with_edges %}
+      {% include "_row.html" with row=row stats=edge focal=False only %}
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if next_url %}<pe-pagination-marker data-url="{{ next_url }}"></pe-pagination-marker>{% endif %}
+</main>
+{% endblock %}
