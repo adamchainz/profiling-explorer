@@ -111,12 +111,6 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
 
 PAGE_SIZE = 200
 
-_SORT_FIELDS = {
-    "calls": "calls",
-    "tottime": "internal_ms",
-    "cumtime": "cumulative_ms",
-}
-
 
 def index(request: HttpRequest) -> HttpResponse:
     sort_col, sort_desc, sort_param = _apply_sort(request)
@@ -157,8 +151,8 @@ def index(request: HttpRequest) -> HttpResponse:
             "q": q,
             "columns": [
                 col_config("calls", "calls"),
-                col_config("tottime", "internal ms"),
-                col_config("cumtime", "cumulative ms"),
+                col_config("internal_ms", "internal ms"),
+                col_config("cumulative_ms", "cumulative ms"),
             ],
         },
     )
@@ -168,12 +162,15 @@ def _apply_sort(request: HttpRequest) -> tuple[str, bool, str]:
     sort_param = request.GET.get("sort", "-cumtime")
     sort_desc = not sort_param.startswith("+")
     sort_col = sort_param.lstrip("+-")
-    if sort_col not in _SORT_FIELDS:
+    if sort_col not in {"calls", "internal_ms", "cumulative_ms"}:
         sort_col = "cumtime"
         sort_desc = True
         sort_param = "-cumtime"
     if profile.sort_col != sort_col or profile.sort_desc != sort_desc:
-        profile.rows.sort(key=attrgetter(_SORT_FIELDS[sort_col]), reverse=sort_desc)
+        profile.rows.sort(
+            key=attrgetter(sort_col, "filename", "lineno", "funcname"),
+            reverse=sort_desc,
+        )
         profile.sort_col = sort_col
         profile.sort_desc = sort_desc
     return sort_col, sort_desc, sort_param
