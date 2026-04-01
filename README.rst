@@ -28,7 +28,7 @@ Table-based exploration tool for Python profiling data (pstats files).
 .. …then in another tab:
 .. uvx shot-scraper --width 1280 --height 720 --retina --wait 1000 http://127.0.0.1:8099/ -o screenshot.png
 
-.. figure:: https://raw.githubusercontent.com/adamchainz/profiling-explorer/screenshot/screenshot.png
+.. figure:: https://raw.githubusercontent.com/adamchainz/profiling-explorer/main/screenshot.png
    :alt: profiling-explorer screenshot
 
 ----
