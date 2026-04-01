@@ -5,7 +5,7 @@ profiling-explorer
 .. image:: https://img.shields.io/github/actions/workflow/status/adamchainz/profiling-explorer/main.yml.svg?branch=main&style=for-the-badge
    :target: https://github.com/adamchainz/profiling-explorer/actions?workflow=CI
 
-.. image:: https://img.shields.io/badge/Coverage-100%25-success?style=for-the-badge
+.. image:: https://img.shields.io/badge/Coverage-79%25-success?style=for-the-badge
    :target: https://github.com/adamchainz/profiling-explorer/actions?workflow=CI
 
 .. image:: https://img.shields.io/pypi/v/profiling-explorer.svg?style=for-the-badge
