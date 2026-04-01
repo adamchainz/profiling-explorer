@@ -7,10 +7,9 @@ import sys
 from collections.abc import Sequence
 
 import django
-from django.conf import settings
 from django.core.management import call_command
 
-from profiling_explorer import views
+from profiling_explorer import settings, views
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -39,37 +38,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    settings.DEBUG = args.dev  # type: ignore[attr-defined]
+
     views.profile = views.build_profile(pstats.Stats(args.filename), args.filename)
 
-    settings.configure(
-        DEBUG=args.dev,
-        ALLOWED_HOSTS=["*"],  # Disable host header validation
-        ROOT_URLCONF="profiling_explorer.urls",
-        SECRET_KEY="we-dont-use-any-secret-features-so-whatever",
-        INSTALLED_APPS=[
-            "profiling_explorer",
-            "django.contrib.humanize",
-        ],
-        MIDDLEWARE=[
-            "django.middleware.common.CommonMiddleware",
-        ],
-        TEMPLATES=[
-            {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
-                "DIRS": [],
-                "APP_DIRS": True,
-                "OPTIONS": {
-                    "builtins": [
-                        "profiling_explorer.templatetags.profiling_explorer_tags",
-                        "django.contrib.humanize.templatetags.humanize",
-                    ],
-                },
-            }
-        ],
-    )
-    # Hide development server warning
-    # https://docs.djangoproject.com/en/stable/ref/django-admin/#envvar-DJANGO_RUNSERVER_HIDE_WARNING
-    os.environ["DJANGO_RUNSERVER_HIDE_WARNING"] = "true"
+    os.environ["DJANGO_SETTINGS_MODULE"] = "profiling_explorer.settings"
 
     django.setup()
 
