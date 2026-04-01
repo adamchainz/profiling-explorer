@@ -82,14 +82,14 @@ nav {
   }
 
   & input[type=search] {
-    margin-left: auto;
-    align-self: center;
+    margin-inline-start: auto;
+    margin-block-end: 0.3rem;
     padding: 0.25rem 0.55rem;
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text);
     font-size: 0.875rem;
-    width: 240px;
+    width: 20rem;
 
     &::placeholder {
       color: var(--text-dim);
@@ -104,7 +104,6 @@ nav {
 }
 
 main {
-  padding: 0 1.5rem;
   overflow: auto;
   flex: 1;
   min-height: 0;
@@ -158,6 +157,11 @@ td {
   font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
   border-bottom: 1px solid var(--border);
   font-variant-numeric: tabular-nums;
+}
+
+td:not(:last-child),
+th:not(:last-child) {
+  width: 1%;
 }
 
 td:last-child {
