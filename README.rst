@@ -22,6 +22,15 @@ profiling-explorer
 
 Table-based exploration tool for Python profiling data (pstats files).
 
+.. Generated with:
+.. uvx --with django python -m cProfile -o django_utils_html.pstats -m django.utils.html
+.. uvr profiling-explorer django_utils_html.pstats
+.. …then in another tab:
+.. uvx shot-scraper --width 1280 --height 720 --retina --wait 1000 http://127.0.0.1:8099/ -o screenshot.png
+
+.. figure:: https://raw.githubusercontent.com/adamchainz/profiling-explorer/screenshot/screenshot.png
+   :alt: profiling-explorer screenshot
+
 ----
 
 **Get better at command line Git** with my book `Boost Your Git DX <https://adamchainz.gumroad.com/l/bygdx>`__.
