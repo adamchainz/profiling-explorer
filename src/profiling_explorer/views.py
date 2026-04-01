@@ -15,9 +15,11 @@ from django.views.decorators.http import require_GET
 
 @dataclass
 class Row:
-    total_calls: int
-    tottime_ms: int
-    cumtime_ms: int
+    calls: int
+    calls_pct: float
+    internal_ms: int
+    cumulative_ms: int
+    cumulative_ms_pct: float
     filename: str
     full_filename: str
     lineno: int
@@ -63,10 +65,11 @@ def _shorten_filename(filename: str) -> str:
 
 def build_profile(s: pstats.Stats, path: str) -> Profile:
     s.sort_stats("cumulative")
+    total_time_ms = round(s.total_tt * 1000)  # type: ignore[attr-defined]
     rows = []
     for key in s.fcn_list:  # type: ignore[attr-defined]
         filename, lineno, funcname = key
-        _, total_calls, tottime, cumtime, _ = s.stats[key]  # type: ignore[attr-defined]
+        _, calls, tottime, cumtime, _ = s.stats[key]  # type: ignore[attr-defined]
         if filename == "~":
             # Built-in / C-level function: pstats uses "~" as a fake path.
             # Mirror pstats' func_std_string: strip <…> angle brackets and
@@ -78,11 +81,18 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
         else:
             short_filename = _shorten_filename(filename)
             full_filename = filename
+        cumulative_ms = round(cumtime * 1_000)
         rows.append(
             Row(
-                total_calls=total_calls,
-                tottime_ms=round(tottime * 1_000),
-                cumtime_ms=round(cumtime * 1_000),
+                calls=calls,
+                calls_pct=(
+                    min(100.0, calls / s.total_calls * 100) if s.total_calls else 0.0  # type: ignore[attr-defined]
+                ),
+                internal_ms=round(tottime * 1_000),
+                cumulative_ms=cumulative_ms,
+                cumulative_ms_pct=min(100.0, cumulative_ms / total_time_ms * 100)
+                if total_time_ms
+                else 0.0,
                 filename=short_filename,
                 full_filename=full_filename,
                 lineno=lineno,
@@ -92,7 +102,7 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
     return Profile(
         filename=path,
         total_calls=s.total_calls,  # type: ignore[attr-defined]
-        total_time_ms=round(s.total_tt * 1000),  # type: ignore[attr-defined]
+        total_time_ms=total_time_ms,
         rows=rows,
         sort_col="cumtime",
         sort_desc=True,
@@ -102,9 +112,9 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
 PAGE_SIZE = 200
 
 _SORT_FIELDS = {
-    "calls": "total_calls",
-    "tottime": "tottime_ms",
-    "cumtime": "cumtime_ms",
+    "calls": "calls",
+    "tottime": "internal_ms",
+    "cumtime": "cumulative_ms",
 }
 
 
