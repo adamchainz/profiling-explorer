@@ -5,3 +5,4 @@ include pyproject.toml
 include README.rst
 include src/*/py.typed
 graft src/profiling_explorer/static/
+graft src/profiling_explorer/templates/

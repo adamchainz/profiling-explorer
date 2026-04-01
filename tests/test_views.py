@@ -3,6 +3,13 @@ from __future__ import annotations
 from django.test import SimpleTestCase
 
 
+class IndexTests(SimpleTestCase):
+    def test_index(self):
+        response = self.client.get("/")
+        assert response.status_code == 200
+        assert b"test.pstats" in response.content
+
+
 class FileTests(SimpleTestCase):
     def test_styles_css(self):
         response = self.client.get("/styles.css")
