@@ -7,7 +7,7 @@ requires = [
 [project]
 name = "profiling-explorer"
 version = "0.0.1"
-description = "Web-based pstats explorer."
+description = "Table-based exploration tool for Python profiling data (pstats files)."
 readme = "README.rst"
 keywords = [
   "profiler",
