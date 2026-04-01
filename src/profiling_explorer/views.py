@@ -69,6 +69,8 @@ _STRIP_PREFIX_RE = re.compile(
 
 
 def _shorten_filename(filename: str) -> str:
+    if filename == "":
+        return ""
     match = _STRIP_PREFIX_RE.match(filename)
     if match:
         return filename[match.end() :]
