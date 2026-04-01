@@ -79,6 +79,12 @@ Then run ``profiling-explorer`` with the generated file:
     $ profiling-explorer example.pstats
 
 The report will open in your web browser, and you can explore the profile data with the interactive interface.
+Features:
+
+* Click the **calls**, **internal ms**, or **cumulative ms** column headers to sort by that column.
+* Use the search box to filter by filename or function name.
+* Hover by a filename + line number pair to reveal the copy button, which copies the location to your clipboard for faster opening.
+* Click the **callers** or **callees** links on the right of a row to see the callers or callees of that function.
 
 Full help:
 
