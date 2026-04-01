@@ -20,7 +20,7 @@ profiling-explorer
 
 ----
 
-Web-based pstats explorer.
+Table-based exploration tool for Python profiling data (pstats files).
 
 ----
 
