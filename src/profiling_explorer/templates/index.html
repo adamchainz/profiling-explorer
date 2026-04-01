@@ -23,7 +23,7 @@
           <tr>
             {% for col in columns %}
             <th><a href="{% querystring sort=col.next_sort %}">{{ col.label }} <pe-sort-indicator>{{ col.indicator }}</pe-sort-indicator></a>
-            {% if col.key == "calls" or col.key == "cumtime" %}<th>%
+            {% if col.key == "calls" or col.key == "cumulative_ms" %}<th>%
             {% endif %}{% endfor %}
             <th>filename:lineno function
         </thead>
