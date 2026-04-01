@@ -47,7 +47,7 @@ body {
   overflow: hidden;
 }
 
-nav {
+nav.primary {
   background: var(--nav-bg);
   color: var(--nav-text);
   flex-shrink: 0;
@@ -103,6 +103,30 @@ nav {
   }
 }
 
+nav.secondary {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+
+  & h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  a.back-link {
+    color: var(--text-dim);
+
+    &:hover {
+      color: var(--text);
+    }
+  }
+}
+
+
 main {
   overflow: auto;
   flex: 1;
@@ -130,16 +154,16 @@ th {
   letter-spacing: .05em;
   color: var(--text-dim);
   border-bottom: 2px solid var(--border);
+  width: 1%;
 
-  &:last-child {
+  &.filename {
+    width: auto;
     text-align: left;
   }
 
   & a {
     text-decoration: none;
     color: inherit;
-    cursor: pointer;
-    user-select: none;
 
     &:hover {
       color: var(--text);
@@ -157,18 +181,17 @@ td {
   font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
   border-bottom: 1px solid var(--border);
   font-variant-numeric: tabular-nums;
+  width: 1%;
 
-  &:not(:last-child) {
-    width: 1%;
-  }
-
-  &:last-child {
+  &.filename {
+    width: auto;
     text-align: left;
   }
-}
 
-th:not(:last-child) {
-  width: 1%;
+  tr.focal & {
+    background: color-mix(in srgb, var(--funcname) 10%, var(--surface));
+    border-bottom: 2px solid var(--border);
+  }
 }
 
 pe-funcname {
@@ -211,6 +234,15 @@ tbody tr:nth-child(even) {
 
 tbody tr:hover {
   background: var(--row-hover);
+}
+
+a.callexs {
+  color: var(--text-dim);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--text);
+  }
 }
 
 pe-pagination-marker {

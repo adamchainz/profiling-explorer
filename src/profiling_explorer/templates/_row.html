@@ -1,0 +1,9 @@
+{% load humanize profiling_explorer_tags %}
+<tr{% if focal %} class=focal{% endif %}>
+  <td>{{ stats.calls|intcomma }}
+  <td class="{{ stats.calls_pct|pct_class }}">{{ stats.calls_pct|pct }}
+  <td>{% if stats.internal_ms != None %}{{ stats.internal_ms|intcomma }}{% endif %}
+  <td>{{ stats.cumulative_ms|intcomma }}
+  <td class="{{ stats.cumulative_ms_pct|pct_class }}">{{ stats.cumulative_ms_pct|pct }}
+  <td class=filename title="{{ row.full_filename }}"><button {% if not row.full_filename %}disabled{% endif %} class=copy-btn data-copy="{{ row.full_filename }}:{{ row.lineno }}" aria-label="Copy"><svg aria-hidden="true" width="18" height="18"><use href="#icon-copy"></use></svg></button>{% if row.filename %}{{ row.filename }}:{{ row.lineno }} {% endif %}<pe-funcname>{{ row.funcname }}</pe-funcname>
+  <td>{% if row.id %}<a class=callexs href="/callers/{{ row.id }}/"><svg aria-hidden="true" width="18" height="18"><use href="#icon-tree" transform="rotate(180 9 9)"></use></svg> callers</a> <a class=callexs href="/callees/{{ row.id }}/"><svg aria-hidden="true" width="18" height="18"><use href="#icon-tree"></use></svg> callees</a>{% endif %}
