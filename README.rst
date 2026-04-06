@@ -31,6 +31,8 @@ Table-based exploration tool for Python profiling data (pstats files).
 .. figure:: https://raw.githubusercontent.com/adamchainz/profiling-explorer/main/screenshot.png
    :alt: profiling-explorer screenshot
 
+Read more in `the introductory blog post <https://adamj.eu/tech/2026/04/03/python-introducing-profiling-explorer/>`__.
+
 ----
 
 **Get better at command line Git** with my book `Boost Your Git DX <https://adamchainz.gumroad.com/l/bygdx>`__.
