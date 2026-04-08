@@ -44,7 +44,7 @@ scripts.profiling-explorer = "profiling_explorer.main:main"
 [dependency-groups]
 test = [
   "cogapp>=3.6",
-  "coverage[toml]",
+  "coverage[toml]>=7.10",
   "pytest",
   "pytest-django",
   "pytest-randomly",
@@ -122,9 +122,6 @@ run.source = [
 paths.source = [
   "src",
   ".tox/**/site-packages",
-]
-report.exclude_also = [
-  "if TYPE_CHECKING:",
 ]
 report.show_missing = true
 report.skip_covered = true

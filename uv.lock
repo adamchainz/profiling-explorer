@@ -251,7 +251,7 @@ requires-dist = [{ name = "django", specifier = ">=5.2" }]
 [package.metadata.requires-dev]
 test = [
     { name = "cogapp", specifier = ">=3.6" },
-    { name = "coverage", extras = ["toml"] },
+    { name = "coverage", extras = ["toml"], specifier = ">=7.10" },
     { name = "pytest" },
     { name = "pytest-django" },
     { name = "pytest-randomly" },
