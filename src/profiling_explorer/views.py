@@ -194,9 +194,14 @@ def _render_table(
         sort_param = "-cumulative_ms"
 
     q = request.GET.get("q", "").strip()
+    queries = [query.strip() for query in q.split() if q.strip()]
     filtered_rows = rows
-    if q:
-        filtered_rows = [r for r in rows if q in r.filename or q in r.funcname]
+    if queries:
+        filtered_rows = [
+            r
+            for r in rows
+            if all(query in r.filename or query in r.funcname for query in queries)
+        ]
 
     if edge_stats is None:
         sorted_rows = sorted(
