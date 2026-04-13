@@ -6,6 +6,11 @@ Changelog
 
   `PR #33 <https://github.com/adamchainz/profiling-explorer/pull/33>`__.
 
+* Fix callers/callees views for built-in functions.
+
+  `PR #34 <https://github.com/adamchainz/profiling-explorer/pull/34>`__.
+  Thanks to David Szotten for the report in `Issue #32 <https://github.com/adamchainz/profiling-explorer/issues/32>`__.
+
 1.0.1 (2026-04-02)
 ------------------
 
