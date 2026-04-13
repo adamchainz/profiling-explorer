@@ -73,10 +73,12 @@ def _shorten_filename_function(filename: str, funcname: str) -> tuple[str, str, 
     else:
         if filename == "":
             short_filename = ""
-        match = _STRIP_PREFIX_RE.match(filename)
-        if match:
-            short_filename = filename[match.end() :]
-        short_filename = os.path.relpath(filename)
+        else:
+            match = _STRIP_PREFIX_RE.match(filename)
+            if match:
+                short_filename = filename[match.end() :]
+            else:
+                short_filename = os.path.relpath(filename)
         full_filename = filename
     return full_filename, short_filename, funcname
 

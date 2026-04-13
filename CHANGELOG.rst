@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Fix filename simplification.
+
+  `PR #36 <https://github.com/adamchainz/profiling-explorer/pull/36>`__.
+
 1.1.0 (2026-04-13)
 ------------------
 
