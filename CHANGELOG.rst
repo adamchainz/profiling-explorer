@@ -2,6 +2,9 @@
 Changelog
 =========
 
+1.1.0 (2026-04-13)
+------------------
+
 * Extend search to support multiple terms.
 
   `PR #33 <https://github.com/adamchainz/profiling-explorer/pull/33>`__.
