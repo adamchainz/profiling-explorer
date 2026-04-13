@@ -4,6 +4,7 @@ import hashlib
 import os
 import pstats
 import re
+from collections import defaultdict
 from dataclasses import dataclass
 from importlib.resources import files as resource_files
 from typing import Any
@@ -24,11 +25,6 @@ class RowStats:
 
 
 @dataclass(slots=True)
-class EdgeStats(RowStats):
-    pass
-
-
-@dataclass(slots=True)
 class Row(RowStats):
     id: str
     filename: str
@@ -44,8 +40,8 @@ class Profile:
     total_time_ms: int
     rows: list[Row]
     rows_by_id: dict[str, Row]
-    callers_map: dict[str, dict[str, EdgeStats]]
-    callees_map: dict[str, dict[str, EdgeStats]]
+    callers_map: defaultdict[str, dict[str, RowStats]]
+    callees_map: defaultdict[str, dict[str, RowStats]]
 
 
 # Populated by main()
@@ -68,13 +64,21 @@ _STRIP_PREFIX_RE = re.compile(
 )
 
 
-def _shorten_filename(filename: str) -> str:
-    if filename == "":
-        return ""
-    match = _STRIP_PREFIX_RE.match(filename)
-    if match:
-        return filename[match.end() :]
-    return os.path.relpath(filename)
+def _shorten_filename_function(filename: str, funcname: str) -> tuple[str, str, str]:
+    if filename == "~":
+        if funcname.startswith("<") and funcname.endswith(">"):
+            funcname = f"{{{funcname[1:-1]}}}"
+        short_filename = ""
+        full_filename = ""
+    else:
+        if filename == "":
+            short_filename = ""
+        match = _STRIP_PREFIX_RE.match(filename)
+        if match:
+            short_filename = filename[match.end() :]
+        short_filename = os.path.relpath(filename)
+        full_filename = filename
+    return full_filename, short_filename, funcname
 
 
 def _row_id(full_filename: str, lineno: int, funcname: str) -> str:
@@ -95,17 +99,14 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
     total_time_ms = round(s.total_tt * 1000)  # type: ignore[attr-defined]
     rows = []
     rows_by_id = {}
+    callers_map: defaultdict[str, dict[str, RowStats]] = defaultdict(dict)
+    callees_map: defaultdict[str, dict[str, RowStats]] = defaultdict(dict)
     for key in s.fcn_list:  # type: ignore[attr-defined]
         filename, lineno, funcname = key
-        _, calls, tottime, cumtime, _ = s.stats[key]  # type: ignore[attr-defined]
-        if filename == "~":
-            if funcname.startswith("<") and funcname.endswith(">"):
-                funcname = f"{{{funcname[1:-1]}}}"
-            short_filename = ""
-            full_filename = ""
-        else:
-            short_filename = _shorten_filename(filename)
-            full_filename = filename
+        _, calls, tottime, cumtime, callers = s.stats[key]  # type: ignore[attr-defined]
+        full_filename, short_filename, funcname = _shorten_filename_function(
+            filename, funcname
+        )
         row_id = _row_id(full_filename, lineno, funcname)
         cumulative_ms = round(cumtime * 1_000)
         row = Row(
@@ -124,31 +125,32 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
         )
         rows.append(row)
         rows_by_id[row_id] = row
-
-    def make_edge(enc: int, etc: float) -> EdgeStats:
-        cumulative_ms = round(etc * 1_000)
-        return EdgeStats(
-            calls=enc,
-            calls_pct=min(100.0, enc / total_calls * 100) if total_calls else 0.0,
-            internal_ms=None,
-            cumulative_ms=cumulative_ms,
-            cumulative_ms_pct=(
-                min(100.0, cumulative_ms / total_time_ms * 100)
-                if total_time_ms
-                else 0.0
-            ),
-        )
-
-    callers_map: dict[str, dict[str, EdgeStats]] = {}
-    callees_map: dict[str, dict[str, EdgeStats]] = {}
-    for (filename, lineno, funcname), (*_, callers) in s.stats.items():  # type: ignore[attr-defined]
-        full_filename = "" if filename == "~" else filename
-        callee_id = _row_id(full_filename, lineno, funcname)
-        for caller_key, (enc, _, __, etc) in callers.items():
-            caller_id = _row_id_from_pstats_key(caller_key)
-            edge = make_edge(enc, etc)
-            callers_map.setdefault(callee_id, {})[caller_id] = edge
-            callees_map.setdefault(caller_id, {})[callee_id] = edge
+        for (caller_filename, caller_lineno, caller_funcname), (
+            callee_calls,
+            _,
+            __,
+            callee_cumtime,
+        ) in callers.items():
+            caller_filename, _, caller_funcname = _shorten_filename_function(
+                caller_filename, caller_funcname
+            )
+            caller_id = _row_id(caller_filename, caller_lineno, caller_funcname)
+            callee_cumulative_ms = round(callee_cumtime * 1_000)
+            edge = RowStats(
+                calls=callee_calls,
+                calls_pct=min(100.0, callee_calls / total_calls * 100)
+                if total_calls
+                else 0.0,
+                internal_ms=None,
+                cumulative_ms=callee_cumulative_ms,
+                cumulative_ms_pct=(
+                    min(100.0, cumulative_ms / total_time_ms * 100)
+                    if total_time_ms
+                    else 0.0
+                ),
+            )
+            callers_map[row_id][caller_id] = edge
+            callees_map[caller_id][row_id] = edge
 
     return Profile(
         filename=path,
@@ -162,8 +164,8 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
 
 
 def _build_edge_rows(
-    edges: dict[str, EdgeStats],
-) -> list[tuple[Row, EdgeStats]]:
+    edges: dict[str, RowStats],
+) -> list[tuple[Row, RowStats]]:
     result = [
         (row, edge)
         for row_id, edge in edges.items()
@@ -183,7 +185,7 @@ def _render_table(
     rows: list[Row],
     template: str,
     extra_context: dict[str, Any],
-    edge_stats: dict[str, EdgeStats] | None = None,
+    edge_stats: dict[str, RowStats] | None = None,
 ) -> HttpResponse:
     sort_param = request.GET.get("sort", "-cumulative_ms")
     sort_desc = not sort_param.startswith("+")
@@ -262,14 +264,14 @@ def index(request: HttpRequest) -> HttpResponse:
 def _callers_callees_view(
     request: HttpRequest,
     focal_row: Row,
-    edges: dict[str, EdgeStats],
+    edges: dict[str, RowStats],
     opposite_url: str,
     heading: str,
     opposite_label: str,
 ) -> HttpResponse:
     rows_with_edges = _build_edge_rows(edges)
     rows = [r for r, _ in rows_with_edges]
-    edge_stats: dict[str, EdgeStats] = {r.id: e for r, e in rows_with_edges}
+    edge_stats: dict[str, RowStats] = {r.id: e for r, e in rows_with_edges}
 
     return _render_table(
         request,
