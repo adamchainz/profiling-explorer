@@ -86,6 +86,8 @@ Features:
 * Click the **calls**, **internal ms**, or **cumulative ms** column headers to sort by that column.
 * Use the search box to filter by filename or function name.
   Separate multiple search terms by spaces to match records that contain all terms.
+* Press a keyboard shortcut to focus the search box: ``/``, ``Control+K``, or ``Command+K``.
+  Select some text first, like a filename, to pre-fill the search box with that text.
 * Hover by a filename + line number pair to reveal the copy button, which copies the location to your clipboard for faster opening.
 * Click the **callers** or **callees** links on the right of a row to see the callers or callees of that function.
 

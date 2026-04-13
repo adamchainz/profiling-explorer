@@ -6,31 +6,62 @@ async function fetchDoc(url, options) {
 
 // Filter box
 const searchInput = document.getElementById('pe-search');
-let searchTimeout = null;
-let searchAbort = null;
 
+document.addEventListener('keydown', (e) => {
+  const target = event.composedPath()?.[0] || event.target;
+  const isTextField =
+    target instanceof HTMLElement &&
+    (["TEXTAREA", "INPUT"].includes(target.tagName) ||
+      target.isContentEditable);
+
+  if (isTextField) {
+    return;
+  }
+
+  const selection = globalThis.getSelection()?.toString();
+  const keyPressed = event.key;
+  const ctrlOrMetaPressed = event.ctrlKey || event.metaKey;
+  const isSlash = keyPressed === "/" && !ctrlOrMetaPressed;
+  const isCtrlK = keyPressed === "k" && ctrlOrMetaPressed && !event.shiftKey;
+
+  if (isSlash || isCtrlK) {
+    event.preventDefault();
+    searchInput.focus();
+    if (selection) {
+      searchInput.value = selection;
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(doSearch, 0);
+    }
+  }
+});
+
+let searchTimeout = null;
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(async () => {
-    const q = searchInput.value.trim();
-    const url = new URL(window.location.href);
-    if (q) {
-      url.searchParams.set('q', q);
-    } else {
-      url.searchParams.delete('q');
-    }
-    history.replaceState(null, '', url);
-
-    searchAbort?.abort();
-    searchAbort = new AbortController();
-    try {
-      const doc = await fetchDoc(url, { signal: searchAbort.signal });
-      document.querySelector('main').replaceWith(doc.querySelector('main'));
-    } catch (e) {
-      if (e.name !== 'AbortError') throw e;
-    }
-  }, 300);
+  searchTimeout = setTimeout(doSearch, 300);
 });
+
+let searchAbort = null;
+
+async function doSearch() {
+  const q = searchInput.value.trim();
+  const url = new URL(window.location.href);
+  if (q) {
+    url.searchParams.set('q', q);
+  } else {
+    url.searchParams.delete('q');
+  }
+  history.replaceState(null, '', url);
+
+  searchAbort?.abort();
+  searchAbort = new AbortController();
+  try {
+    const doc = await fetchDoc(url, { signal: searchAbort.signal });
+    document.querySelector('main').replaceWith(doc.querySelector('main'));
+  } catch (e) {
+    if (e.name !== 'AbortError') throw e;
+  }
+}
 
 // Copy buttons
 document.addEventListener('click', (e) => {

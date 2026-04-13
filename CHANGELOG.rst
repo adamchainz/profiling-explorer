@@ -6,6 +6,10 @@ Changelog
 
   `PR #33 <https://github.com/adamchainz/profiling-explorer/pull/33>`__.
 
+* Add keyboard shortcuts to focus the search box.
+
+  `PR #35 <https://github.com/adamchainz/profiling-explorer/pull/35>`__.
+
 * Fix callers/callees views for built-in functions.
 
   `PR #34 <https://github.com/adamchainz/profiling-explorer/pull/34>`__.
