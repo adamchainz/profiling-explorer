@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Fix caller percentage calculation.
+
+  `PR #37 <https://github.com/adamchainz/profiling-explorer/pull/37>`__.
+
 1.1.1 (2026-04-13)
 ------------------
 

@@ -146,7 +146,7 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
                 internal_ms=None,
                 cumulative_ms=callee_cumulative_ms,
                 cumulative_ms_pct=(
-                    min(100.0, cumulative_ms / total_time_ms * 100)
+                    min(100.0, callee_cumulative_ms / total_time_ms * 100)
                     if total_time_ms
                     else 0.0
                 ),
