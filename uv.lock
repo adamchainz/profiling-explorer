@@ -252,7 +252,7 @@ requires-dist = [{ name = "django", specifier = ">=5.2" }]
 test = [
     { name = "cogapp", specifier = ">=3.6" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.10" },
-    { name = "pytest" },
+    { name = "pytest", specifier = ">=9" },
     { name = "pytest-django" },
     { name = "pytest-randomly" },
 ]
