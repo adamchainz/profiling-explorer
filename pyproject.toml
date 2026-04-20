@@ -45,7 +45,7 @@ scripts.profiling-explorer = "profiling_explorer.main:main"
 test = [
   "cogapp>=3.6",
   "coverage[toml]>=7.10",
-  "pytest",
+  "pytest>=9",
   "pytest-django",
   "pytest-randomly",
 ]
@@ -103,13 +103,9 @@ warn_unreachable = true
 overrides = [ { module = "tests.*", allow_untyped_defs = true } ]
 
 [tool.pytest]
-ini_options.addopts = """\
-    --strict-config
-    --strict-markers
-    --ds=profiling_explorer.settings
-    """
-ini_options.django_find_project = false
-ini_options.xfail_strict = true
+strict = true
+django_find_project = false
+DJANGO_SETTINGS_MODULE = "profiling_explorer.settings"
 
 [tool.coverage]
 run.branch = true
