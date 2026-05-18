@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* Enable changing the sort order in callees and callers views.
+
+  `PR #43 <https://github.com/adamchainz/profiling-explorer/pull/43>`__.
+
 1.1.2 (2026-04-14)
 ------------------
 
