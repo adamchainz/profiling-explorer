@@ -216,8 +216,13 @@ def _render_table(
     else:
         sorted_rows = sorted(
             filtered_rows,
-            key=lambda r: edge_stats[r.id].cumulative_ms,
-            reverse=True,
+            key=lambda r: (
+                getattr(edge_stats[r.id], sort_col) or 0,
+                r.filename,
+                r.lineno,
+                r.funcname,
+            ),
+            reverse=sort_desc,
         )
 
     offset = int(request.GET.get("offset", 0))

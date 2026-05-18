@@ -10,11 +10,10 @@
   <table>
     <thead>
       <tr>
-        <th>calls
-        <th>%
-        <th>internal ms
-        <th>cumulative ms <pe-sort-indicator>↓</pe-sort-indicator>
-        <th>%
+        {% for col in columns %}
+        <th><a href="{% querystring sort=col.next_sort %}">{{ col.label }} <pe-sort-indicator>{{ col.indicator }}</pe-sort-indicator></a>
+        {% if col.key == "calls" or col.key == "cumulative_ms" %}<th>%
+        {% endif %}{% endfor %}
         <th class=filename>filename:lineno function
         <th>
     </thead>
