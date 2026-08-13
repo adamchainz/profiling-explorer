@@ -42,7 +42,7 @@ Read more in `the introductory blog post <https://adamj.eu/tech/2026/04/03/pytho
 Requirements
 ------------
 
-Python 3.10 to 3.14 supported.
+Python 3.10 to 3.15 supported.
 
 Installation
 ------------
