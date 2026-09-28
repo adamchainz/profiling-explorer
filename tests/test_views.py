@@ -29,6 +29,16 @@ class IndexTests(SimpleTestCase):
             assert response.status_code == 200
             assert b'data-url="/?sort=%2Bcalls&amp;offset=1"' in response.content
 
+    def test_invalid_offset(self):
+        response = self.client.get("/", {"offset": "abc"})
+        assert response.status_code == 200
+        assert response.context["rows"][0] is views.profile.rows[0]
+
+    def test_negative_offset(self):
+        response = self.client.get("/", {"offset": "-1"})
+        assert response.status_code == 200
+        assert response.context["rows"][0] is views.profile.rows[0]
+
 
 class CallersTests(SimpleTestCase):
     def test_callers_view(self):
