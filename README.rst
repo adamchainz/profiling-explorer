@@ -83,7 +83,8 @@ Then run ``profiling-explorer`` with the generated file:
 The report will open in your web browser, and you can explore the profile data with the interactive interface.
 Features:
 
-* Click the **calls**, **internal ms**, or **cumulative ms** column headers to sort by that column.
+* Click the **calls**, **internal ms**, **cumulative ms**, or **ms/call** column headers to sort by that column.
+  **ms/call** is the cumulative time divided by the number of calls, useful for finding functions that are slow each time they run, rather than those called many times.
 * Use the search box to filter by filename or function name.
   Separate multiple search terms by spaces to match records that contain all terms.
 * Press a keyboard shortcut to focus the search box: ``/``, ``Control+K``, or ``Command+K``.

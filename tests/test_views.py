@@ -39,6 +39,15 @@ class IndexTests(SimpleTestCase):
         assert response.status_code == 200
         assert response.context["rows"][0] is views.profile.rows[0]
 
+    def test_sort_per_call_ms(self):
+        response = self.client.get("/", {"sort": "-per_call_ms"})
+        assert response.status_code == 200
+        rows = response.context["rows"]
+        assert [r.per_call_ms for r in rows] == sorted(
+            (r.per_call_ms for r in rows), reverse=True
+        )
+        assert b"ms/call" in response.content
+
 
 class CallersTests(SimpleTestCase):
     def test_callers_view(self):
@@ -91,6 +100,7 @@ class RowTests(SimpleTestCase):
             internal_ms=None,
             cumulative_ms=1,
             cumulative_ms_pct=1.0,
+            per_call_ms=1.0,
         )
 
         assert views._build_edge_rows({"missing": edge}) == []
@@ -147,6 +157,7 @@ class BuildProfileTests(SimpleTestCase):
         assert profile.total_time_ms == 0
         assert profile.rows[0].calls_pct == 0.0
         assert profile.rows[0].cumulative_ms_pct == 0.0
+        assert profile.rows[0].per_call_ms == 0.0
         assert profile.callers_map[profile.rows[0].id]
 
 

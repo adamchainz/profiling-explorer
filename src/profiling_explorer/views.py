@@ -22,6 +22,7 @@ class RowStats:
     internal_ms: int | None
     cumulative_ms: int
     cumulative_ms_pct: float
+    per_call_ms: float
 
 
 @dataclass(slots=True)
@@ -120,6 +121,7 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
             cumulative_ms_pct=min(100.0, cumulative_ms / total_time_ms * 100)
             if total_time_ms
             else 0.0,
+            per_call_ms=cumtime * 1_000 / calls if calls else 0.0,
             filename=short_filename,
             full_filename=full_filename,
             lineno=lineno,
@@ -141,6 +143,9 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
                     min(100.0, callee_cumulative_ms / total_time_ms * 100)
                     if total_time_ms
                     else 0.0
+                ),
+                per_call_ms=(
+                    callee_cumtime * 1_000 / callee_calls if callee_calls else 0.0
                 ),
             )
             callers_map[row_id][caller_id] = edge
@@ -171,7 +176,7 @@ def _build_edge_rows(
 
 PAGE_SIZE = 200
 
-_VALID_SORT_COLS = {"calls", "internal_ms", "cumulative_ms"}
+_VALID_SORT_COLS = {"calls", "internal_ms", "cumulative_ms", "per_call_ms"}
 
 
 def _render_table(
@@ -251,6 +256,7 @@ def _render_table(
             col_config("calls", "calls"),
             col_config("internal_ms", "internal ms"),
             col_config("cumulative_ms", "cumulative ms"),
+            col_config("per_call_ms", "ms/call"),
         ],
         **extra_context,
     }
