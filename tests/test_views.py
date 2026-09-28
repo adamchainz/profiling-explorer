@@ -39,6 +39,19 @@ class CallersTests(SimpleTestCase):
         assert response.status_code == 200
         assert b"Callers of" in response.content
 
+    def test_callers_view_focal_row_only_on_first_page(self):
+        row_id = max(
+            views.profile.callers_map, key=lambda k: len(views.profile.callers_map[k])
+        )
+        assert len(views.profile.callers_map[row_id]) >= 2
+
+        with mock.patch.object(views, "PAGE_SIZE", 1):
+            response = self.client.get(f"/callers/{row_id}/")
+            assert response.content.count(b"class=focal") == 1
+
+            response = self.client.get(f"/callers/{row_id}/", {"offset": 1})
+            assert response.content.count(b"class=focal") == 0
+
     def test_callers_view_404(self):
         response = self.client.get("/callers/missing/")
 

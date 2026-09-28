@@ -18,7 +18,7 @@
         <th>
     </thead>
     <tbody>
-      {% include "_row.html" with row=focal_row stats=focal_row focal=True only %}
+      {% if first_page %}{% include "_row.html" with row=focal_row stats=focal_row focal=True only %}{% endif %}
       {% for row, edge in rows_with_edges %}
       {% include "_row.html" with row=row stats=edge focal=False only %}
       {% endfor %}

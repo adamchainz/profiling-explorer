@@ -5,6 +5,8 @@ Changelog
 Unreleased
 ----------
 
+* Fix the focal row being repeated on every page of long callers and callees lists.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.
