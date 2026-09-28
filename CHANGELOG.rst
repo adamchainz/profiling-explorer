@@ -9,6 +9,8 @@ Unreleased
 
 * Fix server error on invalid pagination offsets.
 
+* Fix rows from an older page load being appended after a search replaced the table.
+
 * Support Python 3.15.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.
