@@ -93,6 +93,7 @@ Features:
 * Click a filename + line number pair to open that file at that line in your editor.
   See `Opening files in your editor`_ below.
 * Click the **callers** or **callees** links on the right of a row to see the callers or callees of that function.
+  The **← back** link returns to the main table with your previous search and sort order.
 
 Opening files in your editor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

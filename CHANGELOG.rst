@@ -11,6 +11,8 @@ Unreleased
   profiling-explorer detects a running editor, or uses ``$VISUAL`` or ``$EDITOR``.
   Override the choice with the ``editor`` setting in ``~/.config/profiling-explorer/config.toml`` or the ``--editor`` option.
 
+* Make the back link on callers and callees pages restore the main table’s search and sort order.
+
 * Fix the focal row being repeated on every page of long callers and callees lists.
 
 * Fix server error on invalid pagination offsets.
