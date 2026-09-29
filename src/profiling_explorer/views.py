@@ -10,9 +10,18 @@ from importlib.resources import files as resource_files
 from typing import Any
 from urllib.parse import urlencode
 
-from django.http import FileResponse, Http404, HttpRequest, HttpResponse
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpRequest,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+)
 from django.shortcuts import render
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
+
+from profiling_explorer.editor import EditorError, launch_editor
 
 
 @dataclass(slots=True)
@@ -32,6 +41,8 @@ class Row(RowStats):
     full_filename: str
     lineno: int
     funcname: str
+    # Whether the file exists, so can be opened in an editor
+    is_file: bool
 
 
 @dataclass(slots=True)
@@ -47,6 +58,7 @@ class Profile:
 
 # Populated by main()
 profile: Profile = None  # type: ignore[assignment]
+editor: str | None = None
 
 
 _STRIP_PREFIX_RE = re.compile(
@@ -104,6 +116,7 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
     rows_by_id = {}
     callers_map: defaultdict[str, dict[str, RowStats]] = defaultdict(dict)
     callees_map: defaultdict[str, dict[str, RowStats]] = defaultdict(dict)
+    is_file_cache: dict[str, bool] = {}
     for key in s.fcn_list:  # type: ignore[attr-defined]
         filename, lineno, funcname = key
         _, calls, tottime, cumtime, callers = s.stats[key]  # type: ignore[attr-defined]
@@ -111,6 +124,10 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
             filename, funcname
         )
         row_id = _row_id_from_pstats_key(key)
+        if full_filename not in is_file_cache:
+            is_file_cache[full_filename] = bool(full_filename) and os.path.isfile(
+                full_filename
+            )
         cumulative_ms = round(cumtime * 1_000)
         row = Row(
             id=row_id,
@@ -126,6 +143,7 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
             full_filename=full_filename,
             lineno=lineno,
             funcname=funcname,
+            is_file=is_file_cache[full_filename],
         )
         rows.append(row)
         rows_by_id[row_id] = row
@@ -324,6 +342,35 @@ def callees_view(request: HttpRequest, row_id: str) -> HttpResponse:
         heading="Callees",
         opposite_label="← view callers",
     )
+
+
+_LOCAL_HOSTS = {"127.0.0.1", "localhost", "[::1]"}
+
+
+@require_POST
+def open_in_editor(request: HttpRequest, row_id: str) -> HttpResponse:
+    # This view runs a program, so only accept requests from our own pages.
+    # Websites can send cross-origin POSTs to localhost, and DNS rebinding can
+    # make another hostname resolve here.
+    host = request.get_host().rsplit(":", 1)[0]
+    if host not in _LOCAL_HOSTS:
+        return HttpResponseForbidden("Invalid host.")
+    if request.headers.get("Sec-Fetch-Site", "same-origin") != "same-origin":
+        return HttpResponseForbidden("Cross-site request.")
+    origin = request.headers.get("Origin")
+    if origin is not None and origin != f"{request.scheme}://{request.get_host()}":
+        return HttpResponseForbidden("Cross-origin request.")
+
+    row = profile.rows_by_id.get(row_id)
+    if row is None or not row.is_file:
+        raise Http404()
+
+    try:
+        launch_editor(row.full_filename, row.lineno, editor)
+    except EditorError as exc:
+        return HttpResponseBadRequest(str(exc))
+
+    return HttpResponse(status=204)
 
 
 @require_GET

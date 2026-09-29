@@ -75,6 +75,19 @@ document.addEventListener('click', (e) => {
   });
 });
 
+// Open-in-editor buttons
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('button.open-btn');
+  if (!btn) return;
+
+  const response = await fetch(btn.dataset.url, { method: 'POST' });
+  if (!response.ok) {
+    btn.classList.add('failed');
+    setTimeout(() => btn.classList.remove('failed'), 1500);
+    alert(await response.text());
+  }
+});
+
 
 // Pagination
 class PePaginationMarker extends HTMLElement {

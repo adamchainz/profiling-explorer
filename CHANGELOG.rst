@@ -7,6 +7,10 @@ Unreleased
 
 * Add a **ms/call** column, showing cumulative time divided by number of calls.
 
+* Click a filename to open it at that line in your editor.
+  profiling-explorer detects a running editor, or uses ``$VISUAL`` or ``$EDITOR``.
+  Override the choice with the ``editor`` setting in ``~/.config/profiling-explorer/config.toml`` or the ``--editor`` option.
+
 * Fix the focal row being repeated on every page of long callers and callees lists.
 
 * Fix server error on invalid pagination offsets.

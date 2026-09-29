@@ -7,6 +7,7 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from profiling_explorer import views
+from profiling_explorer.editor import EditorError
 
 
 class IndexTests(SimpleTestCase):
@@ -47,6 +48,78 @@ class IndexTests(SimpleTestCase):
             (r.per_call_ms for r in rows), reverse=True
         )
         assert b"ms/call" in response.content
+
+
+class OpenInEditorTests(SimpleTestCase):
+    def setUp(self):
+        self.row = next(r for r in views.profile.rows if r.is_file)
+        self.url = f"/open/{self.row.id}/"
+        patcher = mock.patch.object(views, "launch_editor")
+        self.launch_editor = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_index_has_open_buttons(self):
+        response = self.client.get("/")
+        assert f'data-url="{self.url}"'.encode() in response.content
+
+    def test_success(self):
+        with mock.patch.object(views, "editor", "code"):
+            response = self.client.post(
+                self.url,
+                headers={
+                    "Sec-Fetch-Site": "same-origin",
+                    "Origin": "http://127.0.0.1:8099",
+                },
+                HTTP_HOST="127.0.0.1:8099",
+            )
+        assert response.status_code == 204, response.content
+        self.launch_editor.assert_called_once_with(
+            self.row.full_filename, self.row.lineno, "code"
+        )
+
+    def test_localhost(self):
+        response = self.client.post(self.url, HTTP_HOST="localhost:8099")
+        assert response.status_code == 204
+
+    def test_get_not_allowed(self):
+        response = self.client.get(self.url, HTTP_HOST="127.0.0.1")
+        assert response.status_code == 405
+        self.launch_editor.assert_not_called()
+
+    def test_other_host(self):
+        response = self.client.post(self.url, HTTP_HOST="evil.example:8099")
+        assert response.status_code == 403
+        self.launch_editor.assert_not_called()
+
+    def test_cross_site(self):
+        response = self.client.post(
+            self.url, headers={"Sec-Fetch-Site": "cross-site"}, HTTP_HOST="127.0.0.1"
+        )
+        assert response.status_code == 403
+        self.launch_editor.assert_not_called()
+
+    def test_other_origin(self):
+        response = self.client.post(
+            self.url, headers={"Origin": "http://evil.example"}, HTTP_HOST="127.0.0.1"
+        )
+        assert response.status_code == 403
+        self.launch_editor.assert_not_called()
+
+    def test_unknown_row(self):
+        response = self.client.post("/open/missing/", HTTP_HOST="127.0.0.1")
+        assert response.status_code == 404
+
+    def test_row_without_file(self):
+        row = next(r for r in views.profile.rows if not r.is_file)
+        response = self.client.post(f"/open/{row.id}/", HTTP_HOST="127.0.0.1")
+        assert response.status_code == 404
+        self.launch_editor.assert_not_called()
+
+    def test_editor_error(self):
+        self.launch_editor.side_effect = EditorError("No editor.")
+        response = self.client.post(self.url, HTTP_HOST="127.0.0.1")
+        assert response.status_code == 400
+        assert response.content == b"No editor."
 
 
 class CallersTests(SimpleTestCase):

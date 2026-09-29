@@ -8,6 +8,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("callers/<str:row_id>/", views.callers_view, name="callers"),
     path("callees/<str:row_id>/", views.callees_view, name="callees"),
+    path("open/<str:row_id>/", views.open_in_editor, name="open"),
     path("favicon.ico", views.favicon),
     path("styles.css", views.file, {"filename": "styles.css"}),
     path("script.js", views.file, {"filename": "script.js"}),

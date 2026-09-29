@@ -90,7 +90,34 @@ Features:
 * Press a keyboard shortcut to focus the search box: ``/``, ``Control+K``, or ``Command+K``.
   Select some text first, like a filename, to pre-fill the search box with that text.
 * Hover by a filename + line number pair to reveal the copy button, which copies the location to your clipboard for faster opening.
+* Click a filename + line number pair to open that file at that line in your editor.
+  See `Opening files in your editor`_ below.
 * Click the **callers** or **callees** links on the right of a row to see the callers or callees of that function.
+
+Opening files in your editor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you click a filename, profiling-explorer runs your editor to open the file at that line.
+It picks the editor to run in this order:
+
+1. The ``--editor`` option.
+2. The ``editor`` setting in the configuration file ``~/.config/profiling-explorer/config.toml`` (or ``$XDG_CONFIG_HOME/profiling-explorer/config.toml``), for example:
+
+   .. code-block:: toml
+
+       editor = "code"
+
+3. A supported editor that’s currently running, such as VS Code, Cursor, PyCharm, Sublime Text, or Zed.
+4. The ``$VISUAL`` environment variable.
+5. The ``$EDITOR`` environment variable.
+
+The editor setting is a command, which may include arguments, like ``"code --new-window"``.
+profiling-explorer knows how to pass the line number to many editors, including VS Code and its forks, JetBrains IDEs, Sublime Text, Zed, Vim, Neovim, Emacs, and nano.
+Other editors open the file without jumping to the line.
+
+Terminal editors like Vim open in the terminal running profiling-explorer.
+
+This feature is based on `launch-editor <https://github.com/vitejs/launch-editor>`__, as used by Vite.
 
 Full help:
 
@@ -116,14 +143,20 @@ Full help:
 
 .. code-block:: console
 
-   usage: profiling-explorer [-h] [--port PORT] [--dev] FILE
+   usage: profiling-explorer [-h] [--port PORT] [--editor COMMAND] [--dev] FILE
 
    positional arguments:
-     FILE         The pstats data file to explore.
+     FILE              The pstats data file to explore.
 
    options:
-     -h, --help   show this help message and exit
-     --port PORT  Port for the local web server (default: 8099).
-     --dev        Run in development mode (enables server reload and debug mode).
+     -h, --help        show this help message and exit
+     --port PORT       Port for the local web server (default: 8099).
+     --editor COMMAND  Command to open source files in your editor, such as
+                       'code' or 'pycharm'. Overrides the 'editor' setting in
+                       ~/.config/profiling-explorer/config.toml. By default,
+                       profiling-explorer detects a running editor, or uses
+                       $VISUAL or $EDITOR.
+     --dev             Run in development mode (enables server reload and debug
+                       mode).
 
 .. [[[end]]]
