@@ -98,7 +98,7 @@ Features:
 Opening files in your editor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When you click a filename, profiling-explorer runs your editor to open the file at that line.
+When you click a filename, profiling-explorer runs your editor to open the file at that line, using `launch-editor <https://pypi.org/project/launch-editor/>`__.
 It picks the editor to run in this order:
 
 1. The ``--editor`` option.
@@ -108,17 +108,16 @@ It picks the editor to run in this order:
 
        editor = "code"
 
-3. A supported editor that’s currently running, such as VS Code, Cursor, PyCharm, Sublime Text, or Zed.
-4. The ``$VISUAL`` environment variable.
-5. The ``$EDITOR`` environment variable.
+3. The ``$LAUNCH_EDITOR`` environment variable, which is also used by Vite and other JavaScript tools.
+4. A supported editor that’s currently running, such as VS Code, Cursor, PyCharm, Sublime Text, or Zed.
+5. The ``$VISUAL`` environment variable.
+6. The ``$EDITOR`` environment variable.
 
 The editor setting is a command, which may include arguments, like ``"code --new-window"``.
-profiling-explorer knows how to pass the line number to many editors, including VS Code and its forks, JetBrains IDEs, Sublime Text, Zed, Vim, Neovim, Emacs, and nano.
+Many editors support opening at a specific line, including VS Code and its forks, JetBrains IDEs, Sublime Text, Zed, Vim, Neovim, Emacs, and nano—see `launch-editor’s list <https://github.com/adamchainz/launch-editor#supported-editors>`__.
 Other editors open the file without jumping to the line.
 
 Terminal editors like Vim open in the terminal running profiling-explorer.
-
-This feature is based on `launch-editor <https://github.com/vitejs/launch-editor>`__, as used by Vite.
 
 Full help:
 
@@ -155,8 +154,8 @@ Full help:
      --editor COMMAND  Command to open source files in your editor, such as
                        'code' or 'pycharm'. Overrides the 'editor' setting in
                        ~/.config/profiling-explorer/config.toml. By default,
-                       profiling-explorer detects a running editor, or uses
-                       $VISUAL or $EDITOR.
+                       profiling-explorer uses $LAUNCH_EDITOR, a running editor,
+                       $VISUAL, or $EDITOR.
      --dev             Run in development mode (enables server reload and debug
                        mode).
 

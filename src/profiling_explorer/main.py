@@ -39,8 +39,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             "Command to open source files in your editor, such as 'code' or "
             + "'pycharm'. Overrides the 'editor' setting in "
             + "~/.config/profiling-explorer/config.toml. By default, "
-            + "profiling-explorer detects a running editor, or uses $VISUAL "
-            + "or $EDITOR."
+            + "profiling-explorer uses $LAUNCH_EDITOR, a running editor, "
+            + "$VISUAL, or $EDITOR."
         ),
     )
     parser.add_argument(

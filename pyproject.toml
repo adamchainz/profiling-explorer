@@ -36,6 +36,7 @@ classifiers = [
 ]
 dependencies = [
   "django>=5.2",
+  "launch-editor>=1.0.0",
   "tomli>=2; python_version<'3.11'",
 ]
 urls.Changelog = "https://github.com/adamchainz/profiling-explorer/blob/main/CHANGELOG.rst"

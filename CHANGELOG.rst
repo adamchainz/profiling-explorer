@@ -8,7 +8,7 @@ Unreleased
 * Add a **ms/call** column, showing cumulative time divided by number of calls.
 
 * Click a filename to open it at that line in your editor.
-  profiling-explorer detects a running editor, or uses ``$VISUAL`` or ``$EDITOR``.
+  profiling-explorer uses `launch-editor <https://pypi.org/project/launch-editor/>`__ to pick your editor from ``$LAUNCH_EDITOR``, a running editor, ``$VISUAL``, or ``$EDITOR``.
   Override the choice with the ``editor`` setting in ``~/.config/profiling-explorer/config.toml`` or the ``--editor`` option.
 
 * Make the back link on callers and callees pages restore the main table’s search and sort order.

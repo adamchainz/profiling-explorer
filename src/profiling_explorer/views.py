@@ -20,8 +20,7 @@ from django.http import (
 )
 from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
-
-from profiling_explorer.editor import EditorError, launch_editor
+from launch_editor import LaunchEditorError, launch_editor
 
 
 @dataclass(slots=True)
@@ -366,8 +365,8 @@ def open_in_editor(request: HttpRequest, row_id: str) -> HttpResponse:
         raise Http404()
 
     try:
-        launch_editor(row.full_filename, row.lineno, editor)
-    except EditorError as exc:
+        launch_editor(row.full_filename, row.lineno, editor=editor)
+    except LaunchEditorError as exc:
         return HttpResponseBadRequest(str(exc))
 
     return HttpResponse(status=204)

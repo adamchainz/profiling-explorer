@@ -5,9 +5,9 @@ from typing import cast
 from unittest import mock
 
 from django.test import SimpleTestCase
+from launch_editor import LaunchEditorError
 
 from profiling_explorer import views
-from profiling_explorer.editor import EditorError
 
 
 class IndexTests(SimpleTestCase):
@@ -74,7 +74,7 @@ class OpenInEditorTests(SimpleTestCase):
             )
         assert response.status_code == 204, response.content
         self.launch_editor.assert_called_once_with(
-            self.row.full_filename, self.row.lineno, "code"
+            self.row.full_filename, self.row.lineno, editor="code"
         )
 
     def test_localhost(self):
@@ -116,7 +116,7 @@ class OpenInEditorTests(SimpleTestCase):
         self.launch_editor.assert_not_called()
 
     def test_editor_error(self):
-        self.launch_editor.side_effect = EditorError("No editor.")
+        self.launch_editor.side_effect = LaunchEditorError("No editor.")
         response = self.client.post(self.url, HTTP_HOST="127.0.0.1")
         assert response.status_code == 400
         assert response.content == b"No editor."
