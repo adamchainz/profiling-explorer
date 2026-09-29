@@ -1,0 +1,121 @@
+[build-system]
+build-backend = "uv_build"
+requires = [
+  "uv-build>=0.12.1,<0.13",
+]
+
+[project]
+name = "launch-editor"
+version = "1.0.0"
+description = "Open files in the user’s editor, at a given line and column."
+readme = "README.rst"
+keywords = [
+  "editor",
+  "launch-editor",
+  "open-in-editor",
+]
+license = "MIT"
+license-files = [ "LICENSE" ]
+authors = [
+  { name = "Adam Johnson", email = "me@adamj.eu" },
+]
+requires-python = ">=3.10"
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+  "Typing :: Typed",
+]
+urls.Changelog = "https://github.com/adamchainz/launch-editor/blob/main/CHANGELOG.rst"
+urls.Funding = "https://adamj.eu/books/"
+urls.Repository = "https://github.com/adamchainz/launch-editor"
+
+[dependency-groups]
+test = [
+  "cogapp>=3.6",
+  "coverage[toml]>=7.10",
+  "pytest>=9",
+  "pytest-randomly",
+]
+
+[tool.ruff]
+lint.select = [
+  # flake8-bugbear
+  "B",
+  # flake8-comprehensions
+  "C4",
+  # pycodestyle
+  "E",
+  # Pyflakes errors
+  "F",
+  # isort
+  "I",
+  # flake8-simplify
+  "SIM",
+  # flake8-tidy-imports
+  "TID",
+  # pyupgrade
+  "UP",
+  # Pyflakes warnings
+  "W",
+]
+lint.ignore = [
+  # flake8-bugbear opinionated rules
+  "B9",
+  # line-too-long
+  "E501",
+  # suppressible-exception
+  "SIM105",
+  # if-else-block-instead-of-if-exp
+  "SIM108",
+]
+lint.extend-safe-fixes = [
+  # non-pep585-annotation
+  "UP006",
+]
+lint.isort.required-imports = [ "from __future__ import annotations" ]
+
+[tool.pyproject-fmt]
+max_supported_python = "3.15"
+
+[tool.mypy]
+mypy_path = "src/"
+namespace_packages = false
+warn_unreachable = true
+enable_error_code = [
+  "ignore-without-code",
+  "redundant-expr",
+  "truthy-bool",
+]
+strict = true
+overrides = [ { module = "tests.*", allow_untyped_defs = true } ]
+
+[tool.pytest]
+strict = true
+
+[tool.coverage]
+run.source = [
+  "launch_editor",
+  "tests",
+]
+run.branch = true
+run.data_file = ".coverage/cov"
+run.parallel = true
+paths.source = [
+  "src",
+  ".tox/**/site-packages",
+]
+report.skip_covered = true
+report.skip_empty = true
+report.show_missing = true
+
+[tool.rstcheck]
+report_level = "ERROR"
