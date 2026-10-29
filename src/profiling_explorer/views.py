@@ -249,6 +249,7 @@ def _render_table(
     context = {
         "profile": profile,
         "rows": page_rows,
+        "first_page": offset == 0,
         "next_url": next_url,
         "q": q,
         "columns": [
