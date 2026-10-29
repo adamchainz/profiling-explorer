@@ -203,6 +203,15 @@ wheels = [
 ]
 
 [[package]]
+name = "launch-editor-py"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/d1/6aa51cec6ab6e095df3a9c04ecaab1167afe7d1be845c539ff6730ada4d6/launch_editor_py-1.0.0.tar.gz", hash = "sha256:7b385a1ec3d14a5ba928b149f3c2f0513d8ebd20e92a20ed47b2c7dd4cb15531", size = 12065, upload-time = "2026-10-29T20:12:18.03Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7b/99/55dbb24777104ade3ebad97167c8e6c6189314db216d885b20c6ab43f6cd/launch_editor_py-1.0.0-py3-none-any.whl", hash = "sha256:d531d5bd96bd2865bcaa0634588f3249142853df2911f842dba78a78fd973a00", size = 12424, upload-time = "2026-10-29T20:12:16.802Z" },
+]
+
+[[package]]
 name = "packaging"
 version = "26.3"
 source = { registry = "https://pypi.org/simple" }
@@ -227,6 +236,7 @@ source = { editable = "." }
 dependencies = [
     { name = "django", version = "5.2.18", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "django", version = "6.1.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "launch-editor-py" },
 ]
 
 [package.dev-dependencies]
@@ -239,7 +249,10 @@ test = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "django", specifier = ">=5.2" }]
+requires-dist = [
+    { name = "django", specifier = ">=5.2" },
+    { name = "launch-editor-py", specifier = ">=1" },
+]
 
 [package.metadata.requires-dev]
 test = [
