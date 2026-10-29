@@ -186,6 +186,17 @@ class RowTests(SimpleTestCase):
         assert views._shorten_filename_function("~", "plain") == ("", "", "plain")
         assert views._shorten_filename_function("", "func") == ("", "", "func")
 
+    def test_shorten_filename_function_different_drive(self):
+        # On Windows, relpath() raises ValueError for paths on another drive.
+        with mock.patch.object(
+            views.os.path,  # type: ignore[attr-defined]
+            "relpath",
+            side_effect=ValueError("path is on mount 'C:', start on mount 'F:'"),
+        ):
+            result = views._shorten_filename_function(r"C:\code\example.py", "func")
+
+        assert result == (r"C:\code\example.py", r"C:\code\example.py", "func")
+
     def test_row_id_from_pstats_key(self):
         assert views._row_id_from_pstats_key(("~", 1, "func")) == views._row_id(
             "", 1, "func"

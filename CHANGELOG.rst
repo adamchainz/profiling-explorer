@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+* Fix crash on Windows when profiled files are on a different drive to the current directory.
+
+  `PR #69 <https://github.com/adamchainz/profiling-explorer/pull/69>`__.
+  Thanks to Serdar Yegulalp for the report in `Issue #40 <https://github.com/adamchainz/profiling-explorer/issues/40>`__.
+
 1.3.0 (2026-10-29)
 ------------------
 
