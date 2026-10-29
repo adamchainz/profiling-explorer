@@ -7,6 +7,8 @@ Unreleased
 
 * Add a **ms/call** column, showing cumulative time divided by number of calls.
 
+* Make the back link on callers and callees pages restore the main table’s search and sort order.
+
 * Fix the focal row being repeated on every page of long callers and callees lists.
 
 * Fix server error on invalid pagination offsets.

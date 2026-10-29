@@ -43,6 +43,26 @@ searchInput.addEventListener('input', () => {
 
 let searchAbort = null;
 
+// Remember the index page's URL, with its search and sort, for back links
+const INDEX_URL_KEY = 'pe-index-url';
+
+function rememberIndexUrl() {
+  if (window.location.pathname !== '/') return;
+  try {
+    sessionStorage.setItem(INDEX_URL_KEY, window.location.search);
+  } catch {}
+}
+
+rememberIndexUrl();
+
+const backLink = document.querySelector('a.back-link');
+if (backLink) {
+  try {
+    const search = sessionStorage.getItem(INDEX_URL_KEY);
+    if (search) backLink.href = '/' + search;
+  } catch {}
+}
+
 async function doSearch() {
   const q = searchInput.value.trim();
   const url = new URL(window.location.href);
@@ -52,6 +72,7 @@ async function doSearch() {
     url.searchParams.delete('q');
   }
   history.replaceState(null, '', url);
+  rememberIndexUrl();
 
   searchAbort?.abort();
   searchAbort = new AbortController();
