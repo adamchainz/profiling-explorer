@@ -89,7 +89,11 @@ def _shorten_filename_function(filename: str, funcname: str) -> tuple[str, str, 
             if match:
                 short_filename = filename[match.end() :]
             else:
-                short_filename = os.path.relpath(filename)
+                try:
+                    short_filename = os.path.relpath(filename)
+                except ValueError:
+                    # On Windows, paths on a different drive can't be relative.
+                    short_filename = filename
         full_filename = filename
     return full_filename, short_filename, funcname
 
