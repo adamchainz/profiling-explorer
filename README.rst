@@ -87,6 +87,7 @@ Features:
   **ms/call** is the cumulative time divided by the number of calls, useful for finding functions that are slow each time they run, rather than those called many times.
 * Use the search box to filter by filename or function name.
   Separate multiple search terms by spaces to match records that contain all terms.
+  Prefix a term with ``-`` to exclude records that contain it, for example ``-importlib``.
 * Press a keyboard shortcut to focus the search box: ``/``, ``Control+K``, or ``Command+K``.
   Select some text first, like a filename, to pre-fill the search box with that text.
 * Hover by a filename + line number pair to reveal the copy button, which copies the location to your clipboard for faster opening.

@@ -218,13 +218,22 @@ def _render_table(
         sort_param = "-cumulative_ms"
 
     q = request.GET.get("q", "").strip()
-    queries = [query.strip() for query in q.split() if q.strip()]
+    includes = []
+    excludes = []
+    for query in q.split():
+        if query.startswith("-") and len(query) > 1:
+            excludes.append(query[1:])
+        else:
+            includes.append(query)
     filtered_rows = rows
-    if queries:
+    if includes or excludes:
         filtered_rows = [
             r
             for r in rows
-            if all(query in r.filename or query in r.funcname for query in queries)
+            if all(query in r.filename or query in r.funcname for query in includes)
+            and not any(
+                query in r.filename or query in r.funcname for query in excludes
+            )
         ]
 
     if edge_stats is None:
