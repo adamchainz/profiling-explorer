@@ -9,6 +9,8 @@ Unreleased
 
 * Fix server error on invalid pagination offsets.
 
+* Fix rows from an older page load being appended after a search replaced the table.
+
 * Drop Python 3.10 support.
 
 * Support Python 3.15.

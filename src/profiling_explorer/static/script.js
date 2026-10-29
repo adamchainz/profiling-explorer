@@ -98,6 +98,9 @@ class PePaginationMarker extends HTMLElement {
   async _load() {
     const doc = await fetchDoc(this.dataset.url);
 
+    // The table may have been replaced by a search while fetching.
+    if (!this.isConnected) return;
+
     const tbody = document.querySelector('tbody');
     for (const row of doc.querySelectorAll('tbody tr')) {
       tbody.appendChild(document.adoptNode(row));
