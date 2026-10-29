@@ -7,7 +7,7 @@ async function fetchDoc(url, options) {
 // Filter box
 const searchInput = document.getElementById('pe-search');
 
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', (event) => {
   const target = event.composedPath()?.[0] || event.target;
   const isTextField =
     target instanceof HTMLElement &&
