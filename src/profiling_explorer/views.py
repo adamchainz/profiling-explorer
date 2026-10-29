@@ -65,10 +65,13 @@ _STRIP_PREFIX_RE = re.compile(
     .*
     (?:
         # virtualenv packages
-        /site-packages/
+        [/\\]site-packages[/\\]
         |
         # standard library
         lib/python3\.\d+/
+        |
+        # standard library on Windows
+        \\Lib\\
     )
     """,
     re.VERBOSE,
