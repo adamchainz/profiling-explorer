@@ -91,7 +91,7 @@ def _row_id(full_filename: str, lineno: int, funcname: str) -> str:
 
 def _row_id_from_pstats_key(key: tuple[str, int, str]) -> str:
     filename, lineno, funcname = key
-    full_filename = "" if filename == "~" else filename
+    full_filename, _, funcname = _shorten_filename_function(filename, funcname)
     return _row_id(full_filename, lineno, funcname)
 
 
@@ -109,7 +109,7 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
         full_filename, short_filename, funcname = _shorten_filename_function(
             filename, funcname
         )
-        row_id = _row_id(full_filename, lineno, funcname)
+        row_id = _row_id_from_pstats_key(key)
         cumulative_ms = round(cumtime * 1_000)
         row = Row(
             id=row_id,
@@ -127,16 +127,8 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
         )
         rows.append(row)
         rows_by_id[row_id] = row
-        for (caller_filename, caller_lineno, caller_funcname), (
-            callee_calls,
-            _,
-            __,
-            callee_cumtime,
-        ) in callers.items():
-            caller_filename, _, caller_funcname = _shorten_filename_function(
-                caller_filename, caller_funcname
-            )
-            caller_id = _row_id(caller_filename, caller_lineno, caller_funcname)
+        for caller_key, (callee_calls, _, __, callee_cumtime) in callers.items():
+            caller_id = _row_id_from_pstats_key(caller_key)
             callee_cumulative_ms = round(callee_cumtime * 1_000)
             edge = RowStats(
                 calls=callee_calls,
