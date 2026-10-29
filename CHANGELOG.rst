@@ -5,26 +5,44 @@ Changelog
 Unreleased
 ----------
 
+* Drop Python 3.10 support.
+
+  `PR #58 <https://github.com/adamchainz/profiling-explorer/pull/58>`__.
+
+* Support Python 3.15.
+
+  `PR #52 <https://github.com/adamchainz/profiling-explorer/pull/52>`__.
+
 * Add a **ms/call** column, showing cumulative time divided by number of calls.
+
+  `PR #66 <https://github.com/adamchainz/profiling-explorer/pull/66>`__.
 
 * Click a filename to open it at that line in your editor.
   profiling-explorer now uses `launch-editor-py <https://pypi.org/project/launch-editor-py/>`__ to find your editor and use it to open file locations on click.
 
+  `PR #68 <https://github.com/adamchainz/profiling-explorer/pull/68>`__.
+
 * Make the back link on callers and callees pages restore the main table’s search and sort order.
+
+  `PR #67 <https://github.com/adamchainz/profiling-explorer/pull/67>`__.
 
 * Fix the focal row being repeated on every page of long callers and callees lists.
 
+  `PR #61 <https://github.com/adamchainz/profiling-explorer/pull/61>`__.
+
 * Fix server error on invalid pagination offsets.
+
+  `PR #62 <https://github.com/adamchainz/profiling-explorer/pull/62>`__.
 
 * Fix rows from an older page load being appended after a search replaced the table.
 
-* Drop Python 3.10 support.
-
-* Support Python 3.15.
+  `PR #65 <https://github.com/adamchainz/profiling-explorer/pull/65>`__.
 
 * Switch package build backend from setuptools to `uv_build <https://docs.astral.sh/uv/concepts/build-backend/>`__.
   This makes builds with uv about nine times faster, since uv runs the backend natively, without creating a build environment or spawning a Python process.
   Additionally, source distributions no longer include test files, which setuptools previously included incompletely, missing the files needed to actually run them.
+
+  `PR #51 <https://github.com/adamchainz/profiling-explorer/pull/51>`__.
 
 1.2.0 (2026-05-18)
 ------------------
