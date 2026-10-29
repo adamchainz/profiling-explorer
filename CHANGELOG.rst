@@ -2,8 +2,8 @@
 Changelog
 =========
 
-Unreleased
-----------
+1.3.1 (2026-10-29)
+------------------
 
 * Fix crash on Windows when profiled files are on a different drive to the current directory.
 
