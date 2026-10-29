@@ -5,6 +5,8 @@ Changelog
 Unreleased
 ----------
 
+* Fix the focal row being repeated on every page of long callers and callees lists.
+
 * Drop Python 3.10 support.
 
 * Support Python 3.15.
