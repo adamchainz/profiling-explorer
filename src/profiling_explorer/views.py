@@ -225,7 +225,10 @@ def _render_table(
             reverse=sort_desc,
         )
 
-    offset = int(request.GET.get("offset", 0))
+    try:
+        offset = max(0, int(request.GET.get("offset", 0)))
+    except ValueError:
+        offset = 0
     page_rows = sorted_rows[offset : offset + PAGE_SIZE]
 
     next_url = None
