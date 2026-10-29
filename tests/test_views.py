@@ -186,6 +186,28 @@ class RowTests(SimpleTestCase):
         assert views._shorten_filename_function("~", "plain") == ("", "", "plain")
         assert views._shorten_filename_function("", "func") == ("", "", "func")
 
+    def test_shorten_filename_function_strips_prefixes(self):
+        cases = [
+            (
+                "/venv/lib/python3.14/site-packages/django/db.py",
+                "django/db.py",
+            ),
+            ("/usr/lib/python3.14/os.py", "os.py"),
+            (
+                r"C:\venv\Lib\site-packages\django\db.py",
+                r"django\db.py",
+            ),
+            (r"C:\Python314\Lib\os.py", "os.py"),
+            (r"C:\Python314\Lib\json\decoder.py", r"json\decoder.py"),
+        ]
+        for filename, expected in cases:
+            with self.subTest(filename=filename):
+                assert views._shorten_filename_function(filename, "func") == (
+                    filename,
+                    expected,
+                    "func",
+                )
+
     def test_shorten_filename_function_different_drive(self):
         # On Windows, relpath() raises ValueError for paths on another drive.
         with mock.patch.object(

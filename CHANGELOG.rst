@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+* Shorten standard library and installed package paths on Windows.
+
+  `PR #70 <https://github.com/adamchainz/profiling-explorer/pull/>`__.
+
 1.3.1 (2026-10-29)
 ------------------
 
