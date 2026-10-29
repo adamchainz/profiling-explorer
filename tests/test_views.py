@@ -31,14 +31,16 @@ class IndexTests(SimpleTestCase):
             assert b'data-url="/?sort=%2Bcalls&amp;offset=1"' in response.content
 
     def test_invalid_offset(self):
+        default_response = self.client.get("/")
         response = self.client.get("/", {"offset": "abc"})
         assert response.status_code == 200
-        assert response.context["rows"][0] is views.profile.rows[0]
+        assert response.context["rows"][0] is default_response.context["rows"][0]
 
     def test_negative_offset(self):
+        default_response = self.client.get("/")
         response = self.client.get("/", {"offset": "-1"})
         assert response.status_code == 200
-        assert response.context["rows"][0] is views.profile.rows[0]
+        assert response.context["rows"][0] is default_response.context["rows"][0]
 
     def test_sort_per_call_ms(self):
         response = self.client.get("/", {"sort": "-per_call_ms"})

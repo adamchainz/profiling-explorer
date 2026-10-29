@@ -149,7 +149,13 @@ def build_profile(s: pstats.Stats, path: str) -> Profile:
         )
         rows.append(row)
         rows_by_id[row_id] = row
-        for caller_key, (callee_calls, _, __, callee_cumtime) in callers.items():
+        for caller_key, caller_value in callers.items():
+            if isinstance(caller_value, tuple):
+                callee_calls, _, __, callee_cumtime = caller_value
+            else:
+                # profiling.sampling stores only a sample count per caller.
+                callee_calls = caller_value
+                callee_cumtime = caller_value * cumtime / calls if calls else 0.0
             caller_id = _row_id_from_pstats_key(caller_key)
             callee_cumulative_ms = round(callee_cumtime * 1_000)
             edge = RowStats(
