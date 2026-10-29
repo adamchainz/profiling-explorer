@@ -35,6 +35,7 @@ classifiers = [
 ]
 dependencies = [
   "django>=5.2",
+  "launch-editor-py>=1",
 ]
 urls.Changelog = "https://github.com/adamchainz/profiling-explorer/blob/main/CHANGELOG.rst"
 urls.Funding = "https://adamj.eu/books/"

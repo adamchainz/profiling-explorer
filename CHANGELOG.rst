@@ -7,6 +7,9 @@ Unreleased
 
 * Add a **ms/call** column, showing cumulative time divided by number of calls.
 
+* Click a filename to open it at that line in your editor.
+  profiling-explorer now uses `launch-editor-py <https://pypi.org/project/launch-editor-py/>`__ to find your editor and use it to open file locations on click.
+
 * Make the back link on callers and callees pages restore the main table’s search and sort order.
 
 * Fix the focal row being repeated on every page of long callers and callees lists.

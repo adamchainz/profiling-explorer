@@ -90,10 +90,26 @@ Features:
 * Press a keyboard shortcut to focus the search box: ``/``, ``Control+K``, or ``Command+K``.
   Select some text first, like a filename, to pre-fill the search box with that text.
 * Hover by a filename + line number pair to reveal the copy button, which copies the location to your clipboard for faster opening.
+* Click a filename + line number pair to open that file at that line in your editor.
+  See `Opening files in your editor`_ below.
 * Click the **callers** or **callees** links on the right of a row to see the callers or callees of that function.
   The **← back** link returns to the main table with your previous search and sort order.
 
-Full help:
+Opening files in your editor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you click a filename, profiling-explorer runs your editor to open the file at that line, using `launch-editor-py <https://pypi.org/project/launch-editor-py/>`__.
+It picks the editor from one of these options, in this order:
+
+1. The ``LAUNCH_EDITOR`` environment variable, for override.s
+2. A supported editor that’s currently running, such as VS Code, Sublime Text, or Zed.
+3. The ``VISUAL`` environment variable.
+4. The ``EDITOR`` environment variable.
+
+Terminal editors like Vim open in the terminal running profiling-explorer.
+
+Full help
+~~~~~~~~~
 
 .. [[[cog
 .. import cog
