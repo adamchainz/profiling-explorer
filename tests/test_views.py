@@ -111,6 +111,17 @@ class RowTests(SimpleTestCase):
         assert views._row_id_from_pstats_key(
             ("example.py", 1, "func")
         ) == views._row_id("example.py", 1, "func")
+        assert views._row_id_from_pstats_key(
+            ("~", 0, "<built-in method len>")
+        ) == views._row_id("", 0, "{built-in method len}")
+
+    def test_builtin_callers_link_to_rows(self):
+        # Every caller/callee edge should resolve to a known row, including
+        # built-ins whose names get rewritten.
+        for callee_id, callers in views.profile.callers_map.items():
+            assert callee_id in views.profile.rows_by_id
+            for caller_id in callers:
+                assert caller_id in views.profile.rows_by_id
 
 
 class BuildProfileTests(SimpleTestCase):
