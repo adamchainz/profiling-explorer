@@ -5,6 +5,8 @@ Changelog
 Unreleased
 ----------
 
+* Add a **ms/call** column, showing cumulative time divided by number of calls.
+
 * Fix the focal row being repeated on every page of long callers and callees lists.
 
 * Fix server error on invalid pagination offsets.
