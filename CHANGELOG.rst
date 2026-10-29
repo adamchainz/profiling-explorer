@@ -7,7 +7,11 @@ Unreleased
 
 * Shorten standard library and installed package paths on Windows.
 
-  `PR #70 <https://github.com/adamchainz/profiling-explorer/pull/>`__.
+  `PR #70 <https://github.com/adamchainz/profiling-explorer/pull/70>`__.
+
+* Support excluding search terms by prefixing them with ``-``, such as ``-importlib``.
+
+  `PR #71 <https://github.com/adamchainz/profiling-explorer/pull/71>`__.
 
 1.3.1 (2026-10-29)
 ------------------

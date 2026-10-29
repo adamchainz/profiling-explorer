@@ -30,6 +30,33 @@ class IndexTests(SimpleTestCase):
             assert response.status_code == 200
             assert b'data-url="/?sort=%2Bcalls&amp;offset=1"' in response.content
 
+    def test_filter_exclude(self):
+        response = self.client.get("/", {"q": "-json"})
+        assert response.status_code == 200
+        assert b'value="-json"' in response.content
+        rows = response.context["rows"]
+        assert rows
+        assert all("json" not in r.filename and "json" not in r.funcname for r in rows)
+
+    def test_filter_include_and_exclude(self):
+        response = self.client.get("/", {"q": "json -decoder"})
+        assert response.status_code == 200
+        rows = response.context["rows"]
+        assert rows
+        assert all(
+            ("json" in r.filename or "json" in r.funcname)
+            and "decoder" not in r.filename
+            and "decoder" not in r.funcname
+            for r in rows
+        )
+
+    def test_filter_lone_dash(self):
+        response = self.client.get("/", {"q": "-"})
+        assert response.status_code == 200
+        rows = response.context["rows"]
+        assert rows
+        assert all("-" in r.filename or "-" in r.funcname for r in rows)
+
     def test_invalid_offset(self):
         response = self.client.get("/", {"offset": "abc"})
         assert response.status_code == 200
